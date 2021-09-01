@@ -1,13 +1,14 @@
 package top.dpdaidai.mn.test.v1;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import top.dpdaidai.mn.beans.exception.BeanCreationException;
 import top.dpdaidai.mn.beans.exception.BeanDefinitionStoreException;
 import top.dpdaidai.mn.beans.factory.BeanDefinition;
-import top.dpdaidai.mn.beans.factory.BeanFactory;
 import top.dpdaidai.mn.beans.factory.PetStoreService;
 import top.dpdaidai.mn.beans.factory.support.DefaultBeanFactory;
+import top.dpdaidai.mn.beans.factory.support.XmlBeanDefinitionReader;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -19,12 +20,21 @@ import static org.junit.Assert.assertNotNull;
  */
 public class BeanFactoryTest {
 
+    DefaultBeanFactory beanFactory = null;
+    XmlBeanDefinitionReader xmlBeanDefinitionReader = null;
+
+    @Before
+    public void setUp() {
+        beanFactory = new DefaultBeanFactory();
+        xmlBeanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+    }
+
     /**
      * 创建BeanFactory , 并实例化petSore
      */
     @Test
     public void testGetBean() {
-        BeanFactory beanFactory = new DefaultBeanFactory("petstore-v1.xml");
+        xmlBeanDefinitionReader.loadBeanDefinition("petstore-v1.xml");
 
         BeanDefinition bd = beanFactory.getBeanDefinition("petStore");
 
@@ -43,7 +53,8 @@ public class BeanFactoryTest {
     public void testInvalidXML() {
 
         try {
-            BeanFactory beanFactory = new DefaultBeanFactory("nonexistent.xml");
+            xmlBeanDefinitionReader.loadBeanDefinition("nonexistent.xml");
+
         } catch (BeanDefinitionStoreException exception) {
             return;
         }
@@ -55,7 +66,7 @@ public class BeanFactoryTest {
 
     @Test
     public void testInvalidBean() {
-        BeanFactory beanFactory = new DefaultBeanFactory("petstore-v1.xml");
+        xmlBeanDefinitionReader.loadBeanDefinition("petstore-v1.xml");
 
         try {
             beanFactory.getBean("nonexistentBean");
