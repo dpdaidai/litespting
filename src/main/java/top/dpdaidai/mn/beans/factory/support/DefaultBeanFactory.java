@@ -1,7 +1,19 @@
 package top.dpdaidai.mn.beans.factory.support;
 
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import top.dpdaidai.mn.beans.factory.BeanDefinition;
 import top.dpdaidai.mn.beans.factory.BeanFactory;
+import top.dpdaidai.mn.beans.factory.GenericBeanDefinition;
+import top.dpdaidai.mn.util.ClassUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Author chenpantao
@@ -10,20 +22,70 @@ import top.dpdaidai.mn.beans.factory.BeanFactory;
  */
 public class DefaultBeanFactory implements BeanFactory {
 
+    public static final String ID_ATTRIBUTE = "id";
+    public static final String CLASS_ATTRIBUTE = "class";
 
-    public DefaultBeanFactory(String url) {
+    private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>();
+
+    public DefaultBeanFactory(String configFile) {
+        loadBeanDefinition(configFile);
+    }
+
+    private void loadBeanDefinition(String configFile) {
+        ClassLoader defaultClassLoader = ClassUtils.getDefaultClassLoader();
+        InputStream is = defaultClassLoader.getResourceAsStream(configFile);
+        SAXReader saxReader = new SAXReader();
+        try {
+            Document document = saxReader.read(is);
+            Element rootElement = document.getRootElement();
+            Iterator iterator = rootElement.elementIterator();
+            while (iterator.hasNext()) {
+                Element next = (Element) iterator.next();
+                String id = next.attributeValue(ID_ATTRIBUTE);
+                String className = next.attributeValue(CLASS_ATTRIBUTE);
+                GenericBeanDefinition genericBeanDefinition = new GenericBeanDefinition(id, className);
+                this.beanDefinitionMap.put(id, genericBeanDefinition);
+            }
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
 
     }
 
-
     public BeanDefinition getBeanDefinition(String beanID) {
-        return null;
+        return this.beanDefinitionMap.get(beanID);
     }
 
     public Object getBean(String beanID) {
 
+        BeanDefinition beanDefinition = this.getBeanDefinition(beanID);
+        if (beanDefinition == null) {
+            //TODO
+        }
+        ClassLoader defaultClassLoader = ClassUtils.getDefaultClassLoader();
+        try {
+            Class<?> aClass = defaultClassLoader.loadClass(beanDefinition.getBeanClassName());
+
+            return aClass.newInstance();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
 
         return null;
+
     }
 
 

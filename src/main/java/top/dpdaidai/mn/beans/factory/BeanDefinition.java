@@ -5,8 +5,6 @@ package top.dpdaidai.mn.beans.factory;
  * @Date 9/1/21 2:44 PM
  * @Version 1.0
  */
-public class BeanDefinition {
-    public String getBeanClassName() {
-        return null;
-    }
+public interface BeanDefinition {
+    public String getBeanClassName() ;
 }
