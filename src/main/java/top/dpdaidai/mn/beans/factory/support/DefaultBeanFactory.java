@@ -4,6 +4,8 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import top.dpdaidai.mn.beans.exception.BeanCreationException;
+import top.dpdaidai.mn.beans.exception.BeanDefinitionStoreException;
 import top.dpdaidai.mn.beans.factory.BeanDefinition;
 import top.dpdaidai.mn.beans.factory.BeanFactory;
 import top.dpdaidai.mn.beans.factory.GenericBeanDefinition;
@@ -48,6 +50,7 @@ public class DefaultBeanFactory implements BeanFactory {
             }
         } catch (DocumentException e) {
             e.printStackTrace();
+            throw new BeanDefinitionStoreException("IOException parsing XML document from " + configFile, e);
         } finally {
             if (is != null) {
                 try {
@@ -72,19 +75,14 @@ public class DefaultBeanFactory implements BeanFactory {
             //TODO
         }
         ClassLoader defaultClassLoader = ClassUtils.getDefaultClassLoader();
+        String beanClassName = beanDefinition.getBeanClassName();
         try {
-            Class<?> aClass = defaultClassLoader.loadClass(beanDefinition.getBeanClassName());
-
+            Class<?> aClass = defaultClassLoader.loadClass(beanClassName);
             return aClass.newInstance();
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
+            throw new BeanCreationException("create bean for " + beanClassName + " failed", e);
         }
-
-        return null;
 
     }
 
