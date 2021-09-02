@@ -1,12 +1,11 @@
 package top.dpdaidai.mn.beans.factory.support;
 
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import top.dpdaidai.mn.beans.exception.BeanDefinitionStoreException;
 import top.dpdaidai.mn.beans.factory.GenericBeanDefinition;
-import top.dpdaidai.mn.util.ClassUtils;
+import top.dpdaidai.mn.core.io.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,11 +28,11 @@ public class XmlBeanDefinitionReader {
         this.registerBeanDefinition = beanDefinitionRegistry;
     }
 
-    public void loadBeanDefinition(String configFile) {
-        ClassLoader defaultClassLoader = ClassUtils.getDefaultClassLoader();
-        InputStream is = defaultClassLoader.getResourceAsStream(configFile);
-        SAXReader saxReader = new SAXReader();
+    public void loadBeanDefinition(Resource resource) {
+        InputStream is = null;
         try {
+            is = resource.getInputStream();
+            SAXReader saxReader = new SAXReader();
             Document document = saxReader.read(is);
             Element rootElement = document.getRootElement();
             Iterator iterator = rootElement.elementIterator();
@@ -44,9 +43,9 @@ public class XmlBeanDefinitionReader {
                 GenericBeanDefinition genericBeanDefinition = new GenericBeanDefinition(id, className);
                 this.registerBeanDefinition.registerBeanDefinition(id, genericBeanDefinition);
             }
-        } catch (DocumentException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            throw new BeanDefinitionStoreException("IOException parsing XML document from " + configFile, e);
+            throw new BeanDefinitionStoreException("IOException parsing XML document from " + resource.getDescription(), e);
         } finally {
             if (is != null) {
                 try {

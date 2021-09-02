@@ -9,6 +9,7 @@ import top.dpdaidai.mn.beans.factory.BeanDefinition;
 import top.dpdaidai.mn.beans.factory.PetStoreService;
 import top.dpdaidai.mn.beans.factory.support.DefaultBeanFactory;
 import top.dpdaidai.mn.beans.factory.support.XmlBeanDefinitionReader;
+import top.dpdaidai.mn.core.io.ClassPathResource;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -34,7 +35,7 @@ public class BeanFactoryTest {
      */
     @Test
     public void testGetBean() {
-        xmlBeanDefinitionReader.loadBeanDefinition("petstore-v1.xml");
+        xmlBeanDefinitionReader.loadBeanDefinition(new ClassPathResource("petstore-v1.xml"));
 
         BeanDefinition bd = beanFactory.getBeanDefinition("petStore");
 
@@ -53,7 +54,7 @@ public class BeanFactoryTest {
     public void testInvalidXML() {
 
         try {
-            xmlBeanDefinitionReader.loadBeanDefinition("nonexistent.xml");
+            xmlBeanDefinitionReader.loadBeanDefinition(new ClassPathResource("nonexistent.xml"));
 
         } catch (BeanDefinitionStoreException exception) {
             return;
@@ -66,7 +67,7 @@ public class BeanFactoryTest {
 
     @Test
     public void testInvalidBean() {
-        xmlBeanDefinitionReader.loadBeanDefinition("petstore-v1.xml");
+        xmlBeanDefinitionReader.loadBeanDefinition(new ClassPathResource("petstore-v1.xml"));
 
         try {
             beanFactory.getBean("nonexistentBean");

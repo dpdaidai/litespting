@@ -2,6 +2,7 @@ package top.dpdaidai.mn.context;
 
 import top.dpdaidai.mn.beans.factory.support.DefaultBeanFactory;
 import top.dpdaidai.mn.beans.factory.support.XmlBeanDefinitionReader;
+import top.dpdaidai.mn.core.io.ClassPathResource;
 
 /**
  * @Author chenpantao
@@ -15,7 +16,8 @@ public class ClassPathXmlApplicationContext implements ApplicationContext {
     public ClassPathXmlApplicationContext(String configFile) {
         defaultBeanFactory = new DefaultBeanFactory();
         XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(defaultBeanFactory);
-        xmlBeanDefinitionReader.loadBeanDefinition(configFile);
+        ClassPathResource classPathResource = new ClassPathResource(configFile);
+        xmlBeanDefinitionReader.loadBeanDefinition(classPathResource);
     }
 
     public Object getBean(String beanID) {
