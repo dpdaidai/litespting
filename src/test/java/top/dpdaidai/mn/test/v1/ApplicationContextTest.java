@@ -4,7 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import top.dpdaidai.mn.beans.factory.PetStoreService;
 import top.dpdaidai.mn.context.ApplicationContext;
-import top.dpdaidai.mn.context.ClassPathXmlApplicationContext;
+import top.dpdaidai.mn.context.suport.ClassPathXmlApplicationContext;
+import top.dpdaidai.mn.context.suport.FileSystemXmlApplicationContext;
 
 /**
  * @Author chenpantao
@@ -16,8 +17,16 @@ public class ApplicationContextTest {
     @Test
     public void testGetBean() {
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("petstore-v1.xml");
-        PetStoreService petStore = (PetStoreService)applicationContext.getBean("petStore");
+        PetStoreService petStore = (PetStoreService) applicationContext.getBean("petStore");
         Assert.assertNotNull(petStore);
     }
+
+    @Test
+    public void TestGetBeanFromFileSystemContext() {
+        ApplicationContext applicationContext = new FileSystemXmlApplicationContext("./src/test/resource/petstore-v1.xml");
+        PetStoreService petStore = (PetStoreService) applicationContext.getBean("petStore");
+        Assert.assertNotNull(petStore);
+    }
+
 
 }

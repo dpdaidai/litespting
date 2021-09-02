@@ -2,7 +2,7 @@ package top.dpdaidai.mn.beans.factory.support;
 
 import top.dpdaidai.mn.beans.exception.BeanCreationException;
 import top.dpdaidai.mn.beans.factory.BeanDefinition;
-import top.dpdaidai.mn.beans.factory.BeanFactory;
+import top.dpdaidai.mn.beans.factory.config.ConfigurableBeanFactory;
 import top.dpdaidai.mn.util.ClassUtils;
 
 import java.util.Map;
@@ -13,9 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date 9/1/21 2:40 PM
  * @Version 1.0
  */
-public class DefaultBeanFactory implements BeanFactory, BeanDefinitionRegistry {
+public class DefaultBeanFactory implements ConfigurableBeanFactory, BeanDefinitionRegistry {
 
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>();
+
+    private ClassLoader classLoader;
 
     public DefaultBeanFactory() {
 
@@ -35,7 +37,7 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionRegistry {
         if (beanDefinition == null) {
             return null;
         }
-        ClassLoader defaultClassLoader = ClassUtils.getDefaultClassLoader();
+        ClassLoader defaultClassLoader = this.getBeanClassloader();
         String beanClassName = beanDefinition.getBeanClassName();
         try {
             Class<?> aClass = defaultClassLoader.loadClass(beanClassName);
@@ -48,4 +50,14 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionRegistry {
     }
 
 
+    public void setBeanClassloader(ClassLoader classloader) {
+        this.classLoader = classloader;
+    }
+
+    public ClassLoader getBeanClassloader() {
+        if (this.classLoader == null) {
+            this.classLoader = ClassUtils.getDefaultClassLoader();
+        }
+        return this.classLoader;
+    }
 }
