@@ -4,6 +4,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import top.dpdaidai.mn.beans.exception.BeanDefinitionStoreException;
+import top.dpdaidai.mn.beans.factory.BeanDefinition;
 import top.dpdaidai.mn.beans.factory.GenericBeanDefinition;
 import top.dpdaidai.mn.core.io.Resource;
 
@@ -35,12 +36,16 @@ public class XmlBeanDefinitionReader {
             SAXReader saxReader = new SAXReader();
             Document document = saxReader.read(is);
             Element rootElement = document.getRootElement();
-            Iterator iterator = rootElement.elementIterator();
+            Iterator<Element> iterator = rootElement.elementIterator();
             while (iterator.hasNext()) {
-                Element next = (Element) iterator.next();
+                Element next = iterator.next();
                 String id = next.attributeValue(ID_ATTRIBUTE);
                 String className = next.attributeValue(CLASS_ATTRIBUTE);
                 GenericBeanDefinition genericBeanDefinition = new GenericBeanDefinition(id, className);
+                String scope = next.attributeValue(BeanDefinition.SCOPE);
+                if (scope != null) {
+                    genericBeanDefinition.setScope(scope);
+                }
                 this.registerBeanDefinition.registerBeanDefinition(id, genericBeanDefinition);
             }
         } catch (Exception e) {

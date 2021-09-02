@@ -13,7 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date 9/1/21 2:40 PM
  * @Version 1.0
  */
-public class DefaultBeanFactory implements ConfigurableBeanFactory, BeanDefinitionRegistry {
+public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
+        implements ConfigurableBeanFactory, BeanDefinitionRegistry {
 
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>();
 
@@ -37,6 +38,26 @@ public class DefaultBeanFactory implements ConfigurableBeanFactory, BeanDefiniti
         if (beanDefinition == null) {
             return null;
         }
+
+        //判断是否是bean的定义是否是单例
+        //如果是单例 , 则直接取 , 如果该bean还为实例化 , 则新生成一个并注册
+        Object bean = null;
+        if (beanDefinition.isSingleton()) {
+            bean = this.getSingletonBean(beanID);
+            if (bean == null) {
+                bean = createBean(beanDefinition);
+                this.registrySingletonBean(beanID, bean);
+            }
+        }
+        return bean;
+    }
+
+    /**
+     * 根据bean定义创建bean实例
+     * @param beanDefinition
+     * @return
+     */
+    private Object createBean(BeanDefinition beanDefinition) {
         ClassLoader defaultClassLoader = this.getBeanClassloader();
         String beanClassName = beanDefinition.getBeanClassName();
         try {
@@ -46,9 +67,7 @@ public class DefaultBeanFactory implements ConfigurableBeanFactory, BeanDefiniti
             e.printStackTrace();
             throw new BeanCreationException("create bean for " + beanClassName + " failed", e);
         }
-
     }
-
 
     public void setBeanClassloader(ClassLoader classloader) {
         this.classLoader = classloader;

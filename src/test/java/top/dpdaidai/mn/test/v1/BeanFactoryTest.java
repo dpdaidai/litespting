@@ -11,8 +11,7 @@ import top.dpdaidai.mn.beans.factory.support.DefaultBeanFactory;
 import top.dpdaidai.mn.beans.factory.support.XmlBeanDefinitionReader;
 import top.dpdaidai.mn.core.io.ClassPathResource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * @Author chenpantao
@@ -39,11 +38,24 @@ public class BeanFactoryTest {
 
         BeanDefinition bd = beanFactory.getBeanDefinition("petStore");
 
+        //判断是否是单例bean
+        assertTrue(bd.isSingleton());
+
+        assertFalse(bd.isPrototype());
+
+        assertEquals(BeanDefinition.SCOPE_DEFAULT, bd.getScope());
+
         assertEquals("top.dpdaidai.mn.beans.factory.PetStoreService", bd.getBeanClassName());
 
         PetStoreService petStoreService = (PetStoreService) beanFactory.getBean("petStore");
 
         assertNotNull(petStoreService);
+
+        PetStoreService petStoreService2 = (PetStoreService) beanFactory.getBean("petStore");
+
+        //判断是否成功实现单例模式
+        assertTrue(petStoreService.equals(petStoreService2));
+
 
     }
 
