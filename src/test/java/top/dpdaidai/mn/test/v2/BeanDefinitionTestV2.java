@@ -48,7 +48,7 @@ public class BeanDefinitionTestV2 {
         }
 
         {
-            PropertyValue propertyValue = this.getPropertyValue("maxNumber", propertyValues);
+            PropertyValue propertyValue = this.getPropertyValue("owner", propertyValues);
 
             Assert.assertNotNull(propertyValue);
 

@@ -7,8 +7,8 @@
     <bean id="petStore" class="top.dpdaidai.mn.service.v2.PetStoreService">
         <property name="accountDao" ref="accountDao"/>
         <property name="itemDao" ref="itemDao"/>
-        <property name="maxNumber" value="5"/>
-
+        <!--<property name="maxNumber" value="5"/>-->
+        <property name="owner" value="cpt"/>
     </bean>
 
     <bean id="itemDao"

@@ -2,9 +2,14 @@ package top.dpdaidai.mn.beans.factory.support;
 
 import top.dpdaidai.mn.beans.exception.BeanCreationException;
 import top.dpdaidai.mn.beans.factory.BeanDefinition;
+import top.dpdaidai.mn.beans.factory.PropertyValue;
 import top.dpdaidai.mn.beans.factory.config.ConfigurableBeanFactory;
 import top.dpdaidai.mn.util.ClassUtils;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,6 +63,15 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
      * @return
      */
     private Object createBean(BeanDefinition beanDefinition) {
+
+        //初始化bean
+        Object bean = instantiateBean(beanDefinition);
+        //填充属性
+        populateBean(beanDefinition, bean);
+        return bean;
+    }
+
+    private Object instantiateBean(BeanDefinition beanDefinition) {
         ClassLoader defaultClassLoader = this.getBeanClassloader();
         String beanClassName = beanDefinition.getBeanClassName();
         try {
@@ -68,6 +82,41 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
             throw new BeanCreationException("create bean for " + beanClassName + " failed", e);
         }
     }
+
+    protected void populateBean(BeanDefinition beanDefinition, Object bean) {
+        List<PropertyValue> propertyValues = beanDefinition.getPropertyValues();
+
+        if (propertyValues == null || propertyValues.isEmpty()) {
+            return;
+        }
+
+        BeanDefinitionValueResolver beanDefinitionValueResolver = new BeanDefinitionValueResolver(this);
+
+
+        for (PropertyValue propertyValue : propertyValues) {
+
+            String propertyValueName = propertyValue.getName();
+            Object originalValue = propertyValue.getValue();
+
+            Object resolveValue = beanDefinitionValueResolver.resolveValueIfNecessary(originalValue);
+
+            try {
+                BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
+                PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+                for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
+                    if (propertyDescriptor.getName().equals(propertyValueName)) {
+                        propertyDescriptor.getWriteMethod().invoke(bean, resolveValue);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new BeanCreationException("Failed to obtain BeanInfo for class [" + beanDefinition.getBeanClassName() + "]", e);
+            }
+
+        }
+
+    }
+
 
     public void setBeanClassloader(ClassLoader classloader) {
         this.classLoader = classloader;

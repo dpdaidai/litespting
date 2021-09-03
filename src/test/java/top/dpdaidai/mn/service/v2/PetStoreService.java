@@ -12,6 +12,8 @@ public class PetStoreService {
 
     private Integer maxNumber;
 
+    private String owner;
+
     public AccountDao getAccountDao() {
         return accountDao;
     }
@@ -36,4 +38,11 @@ public class PetStoreService {
         this.maxNumber = maxNumber;
     }
 
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
 }
