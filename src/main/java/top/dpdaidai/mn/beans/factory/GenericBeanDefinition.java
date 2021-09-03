@@ -1,5 +1,8 @@
 package top.dpdaidai.mn.beans.factory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GenericBeanDefinition implements BeanDefinition {
 
     private String id;
@@ -7,6 +10,8 @@ public class GenericBeanDefinition implements BeanDefinition {
     private boolean singleton = true;
     private boolean prototype = false;
     private String scope = SCOPE_DEFAULT;
+
+    private List<PropertyValue> propertyValueList = new ArrayList<PropertyValue>();
 
     public GenericBeanDefinition(String id, String beanClassName) {
         this.id = id;
@@ -33,6 +38,10 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     public String getBeanClassName() {
         return this.beanClassName;
+    }
+
+    public List<PropertyValue> getPropertyValues() {
+        return this.propertyValueList;
     }
 
 }

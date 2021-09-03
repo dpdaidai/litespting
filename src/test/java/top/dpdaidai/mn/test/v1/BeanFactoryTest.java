@@ -6,7 +6,7 @@ import org.junit.Test;
 import top.dpdaidai.mn.beans.exception.BeanCreationException;
 import top.dpdaidai.mn.beans.exception.BeanDefinitionStoreException;
 import top.dpdaidai.mn.beans.factory.BeanDefinition;
-import top.dpdaidai.mn.beans.factory.PetStoreService;
+import top.dpdaidai.mn.service.v1.PetStoreService;
 import top.dpdaidai.mn.beans.factory.support.DefaultBeanFactory;
 import top.dpdaidai.mn.beans.factory.support.XmlBeanDefinitionReader;
 import top.dpdaidai.mn.core.io.ClassPathResource;
@@ -45,7 +45,7 @@ public class BeanFactoryTest {
 
         assertEquals(BeanDefinition.SCOPE_DEFAULT, bd.getScope());
 
-        assertEquals("top.dpdaidai.mn.beans.factory.PetStoreService", bd.getBeanClassName());
+        assertEquals("top.dpdaidai.mn.service.v1.PetStoreService", bd.getBeanClassName());
 
         PetStoreService petStoreService = (PetStoreService) beanFactory.getBean("petStore");
 

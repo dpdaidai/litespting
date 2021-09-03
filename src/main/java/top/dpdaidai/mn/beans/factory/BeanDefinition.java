@@ -1,5 +1,7 @@
 package top.dpdaidai.mn.beans.factory;
 
+import java.util.List;
+
 /**
  *
  * bean的定义 , 主要包含beanName , 是否单例
@@ -23,6 +25,8 @@ public interface BeanDefinition {
 
     void setScope(String scope);
 
-    public String getBeanClassName() ;
+    public String getBeanClassName();
+
+    public List<PropertyValue> getPropertyValues();
 
 }

@@ -2,7 +2,7 @@ package top.dpdaidai.mn.test.v1;
 
 import org.junit.Assert;
 import org.junit.Test;
-import top.dpdaidai.mn.beans.factory.PetStoreService;
+import top.dpdaidai.mn.service.v1.PetStoreService;
 import top.dpdaidai.mn.context.ApplicationContext;
 import top.dpdaidai.mn.context.suport.ClassPathXmlApplicationContext;
 import top.dpdaidai.mn.context.suport.FileSystemXmlApplicationContext;

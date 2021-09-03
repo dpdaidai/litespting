@@ -1,4 +1,4 @@
-package top.dpdaidai.mn.beans.factory;
+package top.dpdaidai.mn.service.v1;
 
 /**
  * @Author chenpantao
