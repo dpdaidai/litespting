@@ -9,6 +9,7 @@
         <property name="itemDao" ref="itemDao"/>
         <!--<property name="maxNumber" value="5"/>-->
         <property name="owner" value="cpt"/>
+        <property name="version"  value="2"/>
     </bean>
 
     <bean id="itemDao"

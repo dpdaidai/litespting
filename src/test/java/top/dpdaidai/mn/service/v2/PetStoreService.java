@@ -8,11 +8,22 @@ package top.dpdaidai.mn.service.v2;
 public class PetStoreService {
 
     private AccountDao accountDao;
+
     private ItemDao itemDao;
 
     private Integer maxNumber;
 
     private String owner;
+
+    private int version;
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
 
     public AccountDao getAccountDao() {
         return accountDao;
