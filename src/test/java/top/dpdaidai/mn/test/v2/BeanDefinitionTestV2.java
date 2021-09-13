@@ -29,7 +29,7 @@ public class BeanDefinitionTestV2 {
         BeanDefinition petstore = defaultBeanFactory.getBeanDefinition("petStore");
 
         List<PropertyValue> propertyValues = petstore.getPropertyValues();
-        Assert.assertTrue(propertyValues.size() == 3);
+        Assert.assertTrue(propertyValues.size() == 5);
 
         {
             PropertyValue propertyValue = this.getPropertyValue("accountDao", propertyValues);

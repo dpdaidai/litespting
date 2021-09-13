@@ -1,5 +1,6 @@
 package top.dpdaidai.mn.beans.factory.support;
 
+import top.dpdaidai.mn.beans.SimpleTypeConverter;
 import top.dpdaidai.mn.beans.exception.BeanCreationException;
 import top.dpdaidai.mn.beans.factory.BeanDefinition;
 import top.dpdaidai.mn.beans.factory.PropertyValue;
@@ -92,6 +93,7 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
 
         BeanDefinitionValueResolver beanDefinitionValueResolver = new BeanDefinitionValueResolver(this);
 
+        SimpleTypeConverter simpleTypeConverter = new SimpleTypeConverter();
 
         for (PropertyValue propertyValue : propertyValues) {
 
@@ -105,7 +107,10 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
                 PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
                 for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
                     if (propertyDescriptor.getName().equals(propertyValueName)) {
-                        propertyDescriptor.getWriteMethod().invoke(bean, resolveValue);
+
+                        Object convertValue = simpleTypeConverter.convertIfNecessary(resolveValue, propertyDescriptor.getPropertyType());
+
+                        propertyDescriptor.getWriteMethod().invoke(bean, convertValue);
                     }
                 }
             } catch (Exception e) {
