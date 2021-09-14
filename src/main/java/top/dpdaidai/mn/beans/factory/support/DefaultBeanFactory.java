@@ -47,13 +47,15 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
 
         //判断是否是bean的定义是否是单例
         //如果是单例 , 则直接取 , 如果该bean还为实例化 , 则新生成一个并注册
-        Object bean = null;
+        Object bean;
         if (beanDefinition.isSingleton()) {
             bean = this.getSingletonBean(beanID);
             if (bean == null) {
                 bean = createBean(beanDefinition);
                 this.registrySingletonBean(beanID, bean);
             }
+        } else {
+            bean = createBean(beanDefinition);
         }
         return bean;
     }
@@ -76,6 +78,7 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
         ClassLoader defaultClassLoader = this.getBeanClassloader();
         String beanClassName = beanDefinition.getBeanClassName();
         try {
+            //类加载器获取类 , 然后返回一个实例
             Class<?> aClass = defaultClassLoader.loadClass(beanClassName);
             return aClass.newInstance();
         } catch (Exception e) {
@@ -94,30 +97,38 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
         BeanDefinitionValueResolver beanDefinitionValueResolver = new BeanDefinitionValueResolver(this);
 
         SimpleTypeConverter simpleTypeConverter = new SimpleTypeConverter();
+        try {
+            //获取bean的类相关属性
+            BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
+            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
 
-        for (PropertyValue propertyValue : propertyValues) {
+            for (PropertyValue propertyValue : propertyValues) {
 
-            String propertyValueName = propertyValue.getName();
-            Object originalValue = propertyValue.getValue();
+                //property名
+                String propertyValueName = propertyValue.getName();
+                //property值
+                Object originalValue = propertyValue.getValue();
 
-            Object resolveValue = beanDefinitionValueResolver.resolveValueIfNecessary(originalValue);
+                //根据property的类型 , 来解析它的值.
+                //如果是RuntimeBeanReference则给property注入关联的类
+                //如果是TypedStringValue , 则给property填充字符串的值
+                Object resolveValue = beanDefinitionValueResolver.resolveValueIfNecessary(originalValue);
 
-            try {
-                BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
-                PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
                 for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
                     if (propertyDescriptor.getName().equals(propertyValueName)) {
 
+                        //主要是转换字符串类型为别的主数据类型或者包装类型 , 根据property获取property的数据类型 , 然后将字符串转换为对应的数据类型
                         Object convertValue = simpleTypeConverter.convertIfNecessary(resolveValue, propertyDescriptor.getPropertyType());
 
                         propertyDescriptor.getWriteMethod().invoke(bean, convertValue);
                     }
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new BeanCreationException("Failed to obtain BeanInfo for class [" + beanDefinition.getBeanClassName() + "]", e);
-            }
 
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BeanCreationException("Failed to obtain BeanInfo for class [" + beanDefinition.getBeanClassName() + "]", e);
         }
 
     }

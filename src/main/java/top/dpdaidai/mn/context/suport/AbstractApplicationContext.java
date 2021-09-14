@@ -18,6 +18,9 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         defaultBeanFactory = new DefaultBeanFactory();
         XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(defaultBeanFactory);
         Resource resource = this.getResourceByPath(configFile);
+
+        //将xml文件里的内容 , 解析为一个个BeanDefinition , 它是bean的定义类
+        //getBean时会根据 BeanDefinition 实例化bean
         xmlBeanDefinitionReader.loadBeanDefinition(resource);
     }
 
