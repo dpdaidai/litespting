@@ -21,7 +21,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
         //将xml文件里的内容 , 解析为一个个BeanDefinition , 它是bean的定义类
         //getBean时会根据 BeanDefinition 实例化bean
-        xmlBeanDefinitionReader.loadBeanDefinition(resource);
+        xmlBeanDefinitionReader.loadBeanDefinitions(resource);
     }
 
     protected abstract Resource getResourceByPath(String path);

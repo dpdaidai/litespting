@@ -34,7 +34,7 @@ public class BeanFactoryTest {
      */
     @Test
     public void testGetBean() {
-        xmlBeanDefinitionReader.loadBeanDefinition(new ClassPathResource("petstore-v1.xml"));
+        xmlBeanDefinitionReader.loadBeanDefinitions(new ClassPathResource("petstore-v1.xml"));
 
         BeanDefinition bd = beanFactory.getBeanDefinition("petStore");
 
@@ -66,7 +66,7 @@ public class BeanFactoryTest {
     public void testInvalidXML() {
 
         try {
-            xmlBeanDefinitionReader.loadBeanDefinition(new ClassPathResource("nonexistent.xml"));
+            xmlBeanDefinitionReader.loadBeanDefinitions(new ClassPathResource("nonexistent.xml"));
 
         } catch (BeanDefinitionStoreException exception) {
             return;
@@ -79,7 +79,7 @@ public class BeanFactoryTest {
 
     @Test
     public void testInvalidBean() {
-        xmlBeanDefinitionReader.loadBeanDefinition(new ClassPathResource("petstore-v1.xml"));
+        xmlBeanDefinitionReader.loadBeanDefinitions(new ClassPathResource("petstore-v1.xml"));
 
         try {
             beanFactory.getBean("nonexistentBean");

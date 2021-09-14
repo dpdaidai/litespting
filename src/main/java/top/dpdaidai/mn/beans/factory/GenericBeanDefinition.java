@@ -1,5 +1,7 @@
 package top.dpdaidai.mn.beans.factory;
 
+import top.dpdaidai.mn.beans.ConstructorArgument;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,8 @@ public class GenericBeanDefinition implements BeanDefinition {
     private boolean singleton = true;
     private boolean prototype = false;
     private String scope = SCOPE_DEFAULT;
+
+    private ConstructorArgument constructorArgument = new ConstructorArgument();
 
     private List<PropertyValue> propertyValueList = new ArrayList<PropertyValue>();
 
@@ -42,6 +46,18 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     public List<PropertyValue> getPropertyValues() {
         return this.propertyValueList;
+    }
+
+    public ConstructorArgument getConstructorArgument() {
+        return this.constructorArgument;
+    }
+
+    public String getID() {
+        return this.id;
+    }
+
+    public boolean hasConstructorArgumentValues() {
+        return !this.constructorArgument.isEmpty();
     }
 
 }

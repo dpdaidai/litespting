@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import top.dpdaidai.mn.beans.ConstructorArgument;
 import top.dpdaidai.mn.beans.exception.BeanDefinitionStoreException;
 import top.dpdaidai.mn.beans.factory.BeanDefinition;
 import top.dpdaidai.mn.beans.factory.GenericBeanDefinition;
@@ -37,6 +38,10 @@ public class XmlBeanDefinitionReader {
 
     public static final String NAME_ATTRIBUTE = "name";
 
+    public static final String CONSTRUCTOR_ARG_ELEMENT = "constructor-arg";
+
+    public static final String TYPE_ATTRIBUTE = "type";
+
     BeanDefinitionRegistry registerBeanDefinition;
 
     protected final Log logger = LogFactory.getLog(getClass());
@@ -45,7 +50,7 @@ public class XmlBeanDefinitionReader {
         this.registerBeanDefinition = beanDefinitionRegistry;
     }
 
-    public void loadBeanDefinition(Resource resource) {
+    public void loadBeanDefinitions(Resource resource) {
         InputStream is = null;
         try {
             is = resource.getInputStream();
@@ -62,6 +67,7 @@ public class XmlBeanDefinitionReader {
                 if (scope != null) {
                     genericBeanDefinition.setScope(scope);
                 }
+                parseConstructorArgElements(beanElement, genericBeanDefinition);
                 parseBeanElement(beanElement, genericBeanDefinition);
                 this.registerBeanDefinition.registerBeanDefinition(id, genericBeanDefinition);
             }
@@ -78,6 +84,23 @@ public class XmlBeanDefinitionReader {
             }
         }
 
+    }
+
+    public void parseConstructorArgElements(Element beanElement, BeanDefinition beanDefinition) {
+        Iterator iterator = beanElement.elementIterator(CONSTRUCTOR_ARG_ELEMENT);
+        while (iterator.hasNext()) {
+            Element argElement = (Element)iterator.next();
+            parseConstructorArgElement(argElement, beanDefinition);
+        }
+
+    }
+
+    public void parseConstructorArgElement(Element argElement, BeanDefinition beanDefinition) {
+        String type = argElement.attributeValue(TYPE_ATTRIBUTE);
+        String name = argElement.attributeValue(NAME_ATTRIBUTE);
+        Object value = parsePropertyElement(argElement, null);
+        ConstructorArgument.ValueHolder valueHolder = new ConstructorArgument.ValueHolder(value, type, name);
+        beanDefinition.getConstructorArgument().addArgumentValue(valueHolder);
     }
 
     /**
