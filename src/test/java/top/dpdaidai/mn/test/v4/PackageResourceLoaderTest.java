@@ -6,6 +6,10 @@ import top.dpdaidai.mn.core.io.Resource;
 import top.dpdaidai.mn.core.io.support.PackageResourceLoader;
 
 /**
+ *
+ * 测试PackageResourceLoader , 该类用于将指定包名下的文件加载为resource
+ *
+ *
  * @Author chenpantao
  * @Date 9/14/21 9:25 PM
  * @Version 1.0
