@@ -3,6 +3,7 @@ package top.dpdaidai.mn.core.type.classreading;
 import org.springframework.asm.AnnotationVisitor;
 import org.springframework.asm.Type;
 import top.dpdaidai.mn.core.annotation.AnnotationAttributes;
+import top.dpdaidai.mn.core.type.AnnotationMetadata;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -14,7 +15,7 @@ import java.util.Set;
  * @Date 9/15/21 4:24 PM
  * @Version 1.0
  */
-public class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor {
+public class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor implements AnnotationMetadata {
 
     private final Set<String> annotationSet = new LinkedHashSet<String>(4);
     private final Map<String, AnnotationAttributes> attributesMap = new LinkedHashMap<String, AnnotationAttributes>(4);

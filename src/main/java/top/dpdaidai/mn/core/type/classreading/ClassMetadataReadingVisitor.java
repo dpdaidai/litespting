@@ -3,6 +3,7 @@ package top.dpdaidai.mn.core.type.classreading;
 import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.Opcodes;
 import org.springframework.asm.SpringAsmInfo;
+import top.dpdaidai.mn.core.type.ClassMetadata;
 import top.dpdaidai.mn.util.ClassUtils;
 
 /**
@@ -10,7 +11,7 @@ import top.dpdaidai.mn.util.ClassUtils;
  * @Date 9/15/21 3:07 PM
  * @Version 1.0
  */
-public class ClassMetadataReadingVisitor extends ClassVisitor {
+public class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMetadata {
 
     private String className;
     private boolean isInterface;
