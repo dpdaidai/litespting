@@ -17,6 +17,10 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     private List<PropertyValue> propertyValueList = new ArrayList<PropertyValue>();
 
+    public GenericBeanDefinition() {
+
+    }
+
     public GenericBeanDefinition(String id, String beanClassName) {
         this.id = id;
         this.beanClassName = beanClassName;
@@ -44,6 +48,10 @@ public class GenericBeanDefinition implements BeanDefinition {
         return this.beanClassName;
     }
 
+    public void setBeanClassName(String beanClassName) {
+        this.beanClassName = beanClassName;
+    }
+
     public List<PropertyValue> getPropertyValues() {
         return this.propertyValueList;
     }
@@ -54,6 +62,10 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     public String getID() {
         return this.id;
+    }
+
+    public void setID(String id) {
+        this.id = id;
     }
 
     public boolean hasConstructorArgumentValues() {

@@ -5,7 +5,12 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ClassReaderTest.class, PackageResourceLoaderTest.class})
+@SuiteClasses({
+        ClassReaderTest.class,
+        PackageResourceLoaderTest.class,
+        MetadataReaderTest.class,
+        ClassPathBeanDefinitionScannerTest.class
+})
 public class V4AllTests {
 
 }
