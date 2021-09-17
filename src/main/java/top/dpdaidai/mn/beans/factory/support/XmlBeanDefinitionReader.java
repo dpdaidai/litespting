@@ -12,6 +12,7 @@ import top.dpdaidai.mn.beans.factory.GenericBeanDefinition;
 import top.dpdaidai.mn.beans.factory.PropertyValue;
 import top.dpdaidai.mn.beans.factory.config.RuntimeBeanReference;
 import top.dpdaidai.mn.beans.factory.config.TypedStringValue;
+import top.dpdaidai.mn.context.annotation.ClassPathBeanDefinitionScanner;
 import top.dpdaidai.mn.core.io.Resource;
 import top.dpdaidai.mn.util.StringUtils;
 
@@ -42,6 +43,12 @@ public class XmlBeanDefinitionReader {
 
     public static final String TYPE_ATTRIBUTE = "type";
 
+    public static final String BEANS_NAMESPACE_URI = "http://www.springframework.org/schema/beans";
+
+    public static final String CONTEXT_NAMESPACE_URI = "http://www.springframework.org/schema/context";
+
+    private static final String BASE_PACKAGE_ATTRIBUTE = "base-package";
+
     BeanDefinitionRegistry registerBeanDefinition;
 
     protected final Log logger = LogFactory.getLog(getClass());
@@ -60,16 +67,14 @@ public class XmlBeanDefinitionReader {
             Iterator<Element> iterator = rootElement.elementIterator();
             while (iterator.hasNext()) {
                 Element beanElement = iterator.next();
-                String id = beanElement.attributeValue(ID_ATTRIBUTE);
-                String className = beanElement.attributeValue(CLASS_ATTRIBUTE);
-                GenericBeanDefinition genericBeanDefinition = new GenericBeanDefinition(id, className);
-                String scope = beanElement.attributeValue(BeanDefinition.SCOPE);
-                if (scope != null) {
-                    genericBeanDefinition.setScope(scope);
+                String namespaceUri = beanElement.getNamespaceURI();
+
+                if (this.isDefaultNamespace(namespaceUri)) {
+                    parseDefaultElement(beanElement); //普通的bean
+                } else if (this.isContextNamespace(namespaceUri)) {
+                    parseComponentElement(beanElement); //例如<context:component-scan>
                 }
-                parseConstructorArgElements(beanElement, genericBeanDefinition);
-                parseBeanElement(beanElement, genericBeanDefinition);
-                this.registerBeanDefinition.registerBeanDefinition(id, genericBeanDefinition);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,10 +91,52 @@ public class XmlBeanDefinitionReader {
 
     }
 
+    /**
+     * 解析xml定义的bean
+     * @param element
+     */
+    private void parseDefaultElement(Element beanElement) {
+        String id = beanElement.attributeValue(ID_ATTRIBUTE);
+        String className = beanElement.attributeValue(CLASS_ATTRIBUTE);
+        GenericBeanDefinition genericBeanDefinition = new GenericBeanDefinition(id, className);
+        String scope = beanElement.attributeValue(BeanDefinition.SCOPE);
+        if (scope != null) {
+            genericBeanDefinition.setScope(scope);
+        }
+        parseConstructorArgElements(beanElement, genericBeanDefinition);
+        parseBeanElement(beanElement, genericBeanDefinition);
+        this.registerBeanDefinition.registerBeanDefinition(id, genericBeanDefinition);
+
+    }
+
+    /**
+     * 解析context:component-scan中指定的包内所有的bean
+     *
+     * @param componentElement
+     */
+    private void parseComponentElement(Element componentElement) {
+        String basePackage = componentElement.attributeValue(BASE_PACKAGE_ATTRIBUTE);
+        ClassPathBeanDefinitionScanner classPathBeanDefinitionScanner =
+                new ClassPathBeanDefinitionScanner(registerBeanDefinition);
+        classPathBeanDefinitionScanner.doScan(basePackage);
+    }
+
+    //判断element的类型
+    //BEANS_NAMESPACE_URI = "http://www.springframework.org/schema/beans" 属于默认bean类型
+    public boolean isDefaultNamespace(String namespaceUri) {
+        return (!StringUtils.hasLength(namespaceUri) || BEANS_NAMESPACE_URI.equals(namespaceUri));
+    }
+
+    //CONTEXT_NAMESPACE_URI = "http://www.springframework.org/schema/context" 属于包类型
+    public boolean isContextNamespace(String namespaceUri) {
+        return (!StringUtils.hasLength(namespaceUri) || CONTEXT_NAMESPACE_URI.equals(namespaceUri));
+    }
+
+
     public void parseConstructorArgElements(Element beanElement, BeanDefinition beanDefinition) {
         Iterator iterator = beanElement.elementIterator(CONSTRUCTOR_ARG_ELEMENT);
         while (iterator.hasNext()) {
-            Element argElement = (Element)iterator.next();
+            Element argElement = (Element) iterator.next();
             parseConstructorArgElement(argElement, beanDefinition);
         }
 

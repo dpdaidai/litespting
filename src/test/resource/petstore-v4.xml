@@ -11,5 +11,8 @@
 
     </context:component-scan>
 
+    <bean id="A"
+          class="top.dpdaidai.mn.service.v4.config.A">
+    </bean>
 
 </beans>
