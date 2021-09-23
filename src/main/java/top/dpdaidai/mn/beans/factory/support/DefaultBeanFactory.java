@@ -5,6 +5,7 @@ import top.dpdaidai.mn.beans.exception.BeanCreationException;
 import top.dpdaidai.mn.beans.factory.BeanDefinition;
 import top.dpdaidai.mn.beans.factory.PropertyValue;
 import top.dpdaidai.mn.beans.factory.config.ConfigurableBeanFactory;
+import top.dpdaidai.mn.beans.factory.config.DependencyDescriptor;
 import top.dpdaidai.mn.util.ClassUtils;
 
 import java.beans.BeanInfo;
@@ -150,5 +151,29 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
             this.classLoader = ClassUtils.getDefaultClassLoader();
         }
         return this.classLoader;
+    }
+
+    public Object resolveDependency(DependencyDescriptor dependencyDescriptor) {
+        Class<?> typeToMatch = dependencyDescriptor.getDependencyType();
+        for (BeanDefinition beanDefinition : beanDefinitionMap.values()) {
+            resolveBeanClass(beanDefinition);
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            if (typeToMatch.isAssignableFrom(beanClass)) {
+                return this.getBean(beanDefinition.getID());
+            }
+        }
+        return null;
+    }
+
+    public void resolveBeanClass(BeanDefinition beanDefinition) {
+        if (beanDefinition.hasBeanClass()) {
+            return;
+        }else {
+            try {
+                beanDefinition.resolveBeanClass(this.getBeanClassloader());
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException("can't load class :" + beanDefinition.getBeanClassName());
+            }
+        }
     }
 }

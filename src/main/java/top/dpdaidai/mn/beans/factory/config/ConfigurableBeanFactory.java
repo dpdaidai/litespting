@@ -1,8 +1,6 @@
 package top.dpdaidai.mn.beans.factory.config;
 
-import top.dpdaidai.mn.beans.factory.BeanFactory;
-
-public interface ConfigurableBeanFactory extends BeanFactory {
+public interface ConfigurableBeanFactory extends AutowireCapableBeanFactory {
 
     void setBeanClassloader(ClassLoader classloader);
 

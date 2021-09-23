@@ -12,6 +12,7 @@ public class GenericBeanDefinition implements BeanDefinition {
     private boolean singleton = true;
     private boolean prototype = false;
     private String scope = SCOPE_DEFAULT;
+    private Class<?> beanClass;
 
     private ConstructorArgument constructorArgument = new ConstructorArgument();
 
@@ -70,6 +71,31 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     public boolean hasConstructorArgumentValues() {
         return !this.constructorArgument.isEmpty();
+    }
+
+    /**
+     * 解析BeanDefinition的class对象
+     * @param classLoader
+     * @return
+     * @throws ClassNotFoundException
+     */
+    public void resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException {
+        String className = getBeanClassName();
+        if (className == null) return;
+        Class<?> resolvedClass = classLoader.loadClass(className);
+        this.beanClass = resolvedClass;
+    }
+
+    public Class<?> getBeanClass() throws IllegalStateException {
+        if (this.beanClass == null) {
+            throw new IllegalStateException("Bean class name [ " + this.getBeanClassName() +
+                    "] has not been init");
+        }
+        return this.beanClass;
+    }
+
+    public boolean hasBeanClass() {
+        return this.beanClass != null;
     }
 
 }

@@ -10,7 +10,8 @@ import org.junit.runners.Suite.SuiteClasses;
         PackageResourceLoaderTest.class,
         MetadataReaderTest.class,
         ClassPathBeanDefinitionScannerTest.class,
-        XmlBeanDefinitionReaderTest.class
+        XmlBeanDefinitionReaderTest.class,
+        DependencyDescriptorTest.class
 })
 public class V4AllTests {
 

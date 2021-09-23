@@ -34,8 +34,18 @@ public interface BeanDefinition {
     public ConstructorArgument getConstructorArgument();
 
     public String getID();
-    
+
     public boolean hasConstructorArgumentValues();
 
+    /**
+     * 根据bean 的 className解析bean 的class对象
+     * @param classLoader
+     * @throws ClassNotFoundException
+     */
+    public void resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException;
+
+    public Class<?> getBeanClass() throws IllegalStateException;
+
+    public boolean hasBeanClass();
 
 }
