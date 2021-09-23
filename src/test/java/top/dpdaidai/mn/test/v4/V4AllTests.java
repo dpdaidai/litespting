@@ -11,7 +11,8 @@ import org.junit.runners.Suite.SuiteClasses;
         MetadataReaderTest.class,
         ClassPathBeanDefinitionScannerTest.class,
         XmlBeanDefinitionReaderTest.class,
-        DependencyDescriptorTest.class
+        DependencyDescriptorTest.class,
+        InjectionMetadataTest.class
 })
 public class V4AllTests {
 
