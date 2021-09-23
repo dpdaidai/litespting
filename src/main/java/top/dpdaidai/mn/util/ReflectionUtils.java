@@ -88,8 +88,10 @@ public abstract class ReflectionUtils {
 		Assert.notNull(name, "Method name must not be null");
 		Class<?> searchType = clazz;
 		while (searchType != null) {
+			//根据目标class对象是接口还是普通类, 使用不同的方法获取methods
 			Method[] methods = (searchType.isInterface() ? searchType.getMethods() : getDeclaredMethods(searchType));
 			for (Method method : methods) {
+				//如果方法名和name相同 , 并且参数类型相同 , 则是目标方法
 				if (name.equals(method.getName()) &&
 						(paramTypes == null || Arrays.equals(paramTypes, method.getParameterTypes()))) {
 					return method;
