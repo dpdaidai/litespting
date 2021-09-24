@@ -4,13 +4,16 @@ import top.dpdaidai.mn.beans.SimpleTypeConverter;
 import top.dpdaidai.mn.beans.exception.BeanCreationException;
 import top.dpdaidai.mn.beans.factory.BeanDefinition;
 import top.dpdaidai.mn.beans.factory.PropertyValue;
+import top.dpdaidai.mn.beans.factory.config.BeanPostProcessor;
 import top.dpdaidai.mn.beans.factory.config.ConfigurableBeanFactory;
 import top.dpdaidai.mn.beans.factory.config.DependencyDescriptor;
+import top.dpdaidai.mn.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import top.dpdaidai.mn.util.ClassUtils;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +29,9 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>();
 
     private ClassLoader classLoader;
+
+    //BeanPostProcessor为什么会有多个
+    private List<BeanPostProcessor> beanPostProcessors = new ArrayList<BeanPostProcessor>();
 
     public DefaultBeanFactory() {
 
@@ -96,6 +102,16 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
     }
 
     protected void populateBean(BeanDefinition beanDefinition, Object bean) {
+
+        //在bean的实例化时做的操作
+        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+            //如果BeanPostProcessor 属于bean实例化时的操作
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessPropertyValues(bean, beanDefinition.getID());
+            }
+        }
+
+        //根据xml解析的propertyValues填充bean
         List<PropertyValue> propertyValues = beanDefinition.getPropertyValues();
 
         if (propertyValues == null || propertyValues.isEmpty()) {
@@ -153,6 +169,14 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
         return this.classLoader;
     }
 
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        this.beanPostProcessors.add(beanPostProcessor);
+    }
+
+    public List<BeanPostProcessor> getBeanPostProcessors() {
+        return this.beanPostProcessors;
+    }
+
     public Object resolveDependency(DependencyDescriptor dependencyDescriptor) {
         Class<?> typeToMatch = dependencyDescriptor.getDependencyType();
         for (BeanDefinition beanDefinition : beanDefinitionMap.values()) {
@@ -168,7 +192,7 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
     public void resolveBeanClass(BeanDefinition beanDefinition) {
         if (beanDefinition.hasBeanClass()) {
             return;
-        }else {
+        } else {
             try {
                 beanDefinition.resolveBeanClass(this.getBeanClassloader());
             } catch (ClassNotFoundException e) {

@@ -1,5 +1,7 @@
 package top.dpdaidai.mn.context.suport;
 
+import top.dpdaidai.mn.beans.factory.annotation.AutowiredAnnotationProcessor;
+import top.dpdaidai.mn.beans.factory.config.ConfigurableBeanFactory;
 import top.dpdaidai.mn.beans.factory.support.DefaultBeanFactory;
 import top.dpdaidai.mn.beans.factory.support.XmlBeanDefinitionReader;
 import top.dpdaidai.mn.context.ApplicationContext;
@@ -22,6 +24,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         //将xml文件里的内容 , 解析为一个个BeanDefinition , 它是bean的定义类
         //getBean时会根据 BeanDefinition 实例化bean
         xmlBeanDefinitionReader.loadBeanDefinitions(resource);
+        registerBeanPostProcessors(defaultBeanFactory);
     }
 
     protected abstract Resource getResourceByPath(String path);
@@ -37,4 +40,17 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     public Object getBean(String beanID) {
         return defaultBeanFactory.getBean(beanID);
     }
+
+    /**
+     * 注册post processor
+     * 可注册多个
+     *
+     * @param beanFactory
+     */
+    protected void registerBeanPostProcessors(ConfigurableBeanFactory beanFactory) {
+        AutowiredAnnotationProcessor autowiredAnnotationProcessor = new AutowiredAnnotationProcessor();
+        autowiredAnnotationProcessor.setBeanFactory(beanFactory);
+        beanFactory.addBeanPostProcessor(autowiredAnnotationProcessor);
+    }
+
 }

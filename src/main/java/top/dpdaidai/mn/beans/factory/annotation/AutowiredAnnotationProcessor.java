@@ -1,6 +1,8 @@
 package top.dpdaidai.mn.beans.factory.annotation;
 
+import top.dpdaidai.mn.beans.exception.BeansException;
 import top.dpdaidai.mn.beans.factory.config.AutowireCapableBeanFactory;
+import top.dpdaidai.mn.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import top.dpdaidai.mn.core.annotation.AnnotationUtils;
 import top.dpdaidai.mn.util.ReflectionUtils;
 
@@ -22,7 +24,7 @@ import java.util.Set;
  * @Date 9/23/21 4:57 PM
  * @Version 1.0
  */
-public class AutowiredAnnotationProcessor {
+public class AutowiredAnnotationProcessor implements InstantiationAwareBeanPostProcessor {
 
     private AutowireCapableBeanFactory autowireCapableBeanFactory;
 
@@ -114,4 +116,24 @@ public class AutowiredAnnotationProcessor {
 
     }
 
+    public Object beforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
+        return null;
+    }
+
+    public boolean afterInstantiation(Object bean, String beanName) throws BeansException {
+        return true;
+    }
+
+    public void postProcessPropertyValues(Object bean, String beanName) throws BeansException {
+        InjectionMetadata injectionMetadata = buildAutowiringMetadata(bean.getClass());
+        injectionMetadata.inject(bean);
+    }
+
+    public Object beforeInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
+
+    public Object afterInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
 }
