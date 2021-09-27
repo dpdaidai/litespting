@@ -2,6 +2,7 @@ package top.dpdaidai.mn.beans.factory.support;
 
 import top.dpdaidai.mn.beans.SimpleTypeConverter;
 import top.dpdaidai.mn.beans.exception.BeanCreationException;
+import top.dpdaidai.mn.beans.exception.NoSuchBeanDefinitionException;
 import top.dpdaidai.mn.beans.factory.BeanDefinition;
 import top.dpdaidai.mn.beans.factory.PropertyValue;
 import top.dpdaidai.mn.beans.factory.config.BeanPostProcessor;
@@ -65,6 +66,15 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
             bean = createBean(beanDefinition);
         }
         return bean;
+    }
+
+    public Class<?> getType(String beanID) throws NoSuchBeanDefinitionException {
+        BeanDefinition beanDefinition = this.getBeanDefinition(beanID);
+        if(beanDefinition == null){
+            throw new NoSuchBeanDefinitionException(beanID);
+        }
+        resolveBeanClass(beanDefinition);
+        return beanDefinition.getBeanClass();
     }
 
     /**

@@ -12,8 +12,10 @@
 
     </context:component-scan>
 
+    <bean id="transactionManager" class="top.dpdaidai.mn.service.tx.TransactionManager"/>
+
     <aop:config>
-        <aop:aspect ref="tx">
+        <aop:aspect ref="transactionManager">
             <aop:pointcut id="placeOrder" expression="execution(* top.dpdaidai.mn.service.v5.*.placeOrder(..))"/>
             <aop:before pointcut-ref="placeOrder" method="start"/>
             <aop:after-returning pointcut-ref="placeOrder" method="commit"/>

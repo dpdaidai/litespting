@@ -1,5 +1,6 @@
 package top.dpdaidai.mn.context.suport;
 
+import top.dpdaidai.mn.beans.exception.NoSuchBeanDefinitionException;
 import top.dpdaidai.mn.beans.factory.annotation.AutowiredAnnotationProcessor;
 import top.dpdaidai.mn.beans.factory.config.ConfigurableBeanFactory;
 import top.dpdaidai.mn.beans.factory.support.DefaultBeanFactory;
@@ -53,4 +54,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         beanFactory.addBeanPostProcessor(autowiredAnnotationProcessor);
     }
 
+    public Class<?> getType(String beanID) throws NoSuchBeanDefinitionException {
+        return this.defaultBeanFactory.getType(beanID);
+    }
 }
