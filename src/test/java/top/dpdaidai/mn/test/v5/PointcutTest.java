@@ -21,14 +21,18 @@ public class PointcutTest {
         String expression = "execution(* top.dpdaidai.mn.service.v5.*.placeOrder(..))";
 
         AspectExpressionPointcut pointcut = new AspectExpressionPointcut();
+        //设置切点表达式 , 初始化
         pointcut.setExpression(expression);
 
+        //获取方法匹配器
         MethodMatcher methodMatcher = pointcut.getMethodMatcher();
 
         {
             Class<?> targetClass = PetStoreService.class;
 
             Method placeOrder = targetClass.getMethod("placeOrder");
+
+            //使用方法匹配器MethodMatcher 和 目标method匹配 , 返回匹配结果
             Assert.assertTrue(methodMatcher.matches(placeOrder));
 
             Method getAccountDao = targetClass.getMethod("getAccountDao");

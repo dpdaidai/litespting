@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import top.dpdaidai.mn.aop.aspect.AspectJAfterReturningAdvice;
 import top.dpdaidai.mn.aop.aspect.AspectJBeforeAdvice;
-import top.dpdaidai.mn.aop.aspect.AspectJafterThrowingAdvice;
+import top.dpdaidai.mn.aop.aspect.AspectJAfterThrowingAdvice;
 import top.dpdaidai.mn.aop.framework.ReflectiveMethodInvocation;
 import top.dpdaidai.mn.service.tx.TransactionManager;
 import top.dpdaidai.mn.service.util.MessageTracker;
@@ -25,7 +25,7 @@ public class ReflectiveMethodInvocationTest {
 
     private AspectJBeforeAdvice beforeAdvice = null;
     private AspectJAfterReturningAdvice afterReturningAdvice = null;
-    private AspectJafterThrowingAdvice throwingAdvice = null;
+    private AspectJAfterThrowingAdvice throwingAdvice = null;
     private PetStoreService petStoreService = null;
     private TransactionManager transactionManager;
 
@@ -36,13 +36,13 @@ public class ReflectiveMethodInvocationTest {
         MessageTracker.clearMsgs();
 
         beforeAdvice = new AspectJBeforeAdvice(
-                TransactionManager.class.getMethod("start"), transactionManager);
+                TransactionManager.class.getMethod("start"), transactionManager, null);
 
         afterReturningAdvice = new AspectJAfterReturningAdvice(
-                TransactionManager.class.getMethod("commit"), transactionManager);
+                TransactionManager.class.getMethod("commit"), transactionManager, null);
 
-        throwingAdvice = new AspectJafterThrowingAdvice(
-                TransactionManager.class.getMethod("rollback"), transactionManager);
+        throwingAdvice = new AspectJAfterThrowingAdvice(
+                TransactionManager.class.getMethod("rollback"), transactionManager, null);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class ReflectiveMethodInvocationTest {
     }
 
     @Test
-    public void testReflectiveMethodInvocation2() throws Throwable{
+    public void testReflectiveMethodInvocation2() throws Throwable {
         ArrayList<MethodInterceptor> methodInterceptors = new ArrayList<MethodInterceptor>();
         methodInterceptors.add(afterReturningAdvice);
         methodInterceptors.add(beforeAdvice);

@@ -40,7 +40,7 @@ public class DynamicProxyHandlerTest {
         // 代理类在 com/sun/proxy/$Proxy0.class
         //「super.h.invoke(…)」本质上都会调用到我们自己实现的InvocationHandler的实现类 —— 「DynamicProxyHandler#invoke」方法，「DynamicProxyHandler#invoke」中会去调用真实对象的相应的方法。
         // 也就是说，本例子中「equals」、「toString」、「hashCode」、「request」方法最终都会通过动态代理调用到真实的 Student 的对应的方法。
-        System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
+//        System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
 
         People people = new Student();
 

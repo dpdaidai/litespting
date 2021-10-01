@@ -38,7 +38,7 @@ public class CglibTest {
 
 
         studentProxy.sayBye("cpt");
-//        studentProxy.sayHello("cpt");
+        studentProxy.sayHello("cpt");
 //        studentProxy.sayNo("no");
 
         //调用toString也会调用MethodInterceptor
@@ -65,7 +65,7 @@ public class CglibTest {
 
         enhancer.setSuperclass(Student.class);
 
-        //
+        // filter里面的accept()方法 , 定义了根据不同的method调用callbackList内的index
         CallbackFilter targetMethodCallbackFilter = new TargetMethodCallbackFilter();
 
         /*

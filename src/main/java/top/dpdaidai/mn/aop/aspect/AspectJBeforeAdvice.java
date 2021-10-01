@@ -1,6 +1,7 @@
 package top.dpdaidai.mn.aop.aspect;
 
 import org.aopalliance.intercept.MethodInvocation;
+import top.dpdaidai.mn.aop.Pointcut;
 
 import java.lang.reflect.Method;
 
@@ -12,10 +13,10 @@ import java.lang.reflect.Method;
  * @Date 9/27/21 10:06 PM
  * @Version 1.0
  */
-public class AspectJBeforeAdvice extends AbstractAspectJAdvice{
+public class AspectJBeforeAdvice extends AbstractAspectJAdvice {
 
-    public AspectJBeforeAdvice(Method adviceMethod, Object adviceObject) {
-        super(adviceMethod, adviceObject);
+    public AspectJBeforeAdvice(Method adviceMethod, Object adviceObject, Pointcut pointcut) {
+        super(adviceMethod, adviceObject, pointcut);
     }
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
