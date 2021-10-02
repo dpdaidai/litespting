@@ -7,7 +7,13 @@ import org.junit.Test;
 import top.dpdaidai.mn.aop.aspect.AspectJAfterReturningAdvice;
 import top.dpdaidai.mn.aop.aspect.AspectJBeforeAdvice;
 import top.dpdaidai.mn.aop.aspect.AspectJAfterThrowingAdvice;
+import top.dpdaidai.mn.aop.config.AspectInstanceFactory;
 import top.dpdaidai.mn.aop.framework.ReflectiveMethodInvocation;
+import top.dpdaidai.mn.beans.factory.BeanFactory;
+import top.dpdaidai.mn.beans.factory.support.DefaultBeanFactory;
+import top.dpdaidai.mn.beans.factory.support.XmlBeanDefinitionReader;
+import top.dpdaidai.mn.core.io.ClassPathResource;
+import top.dpdaidai.mn.core.io.Resource;
 import top.dpdaidai.mn.service.tx.TransactionManager;
 import top.dpdaidai.mn.service.util.MessageTracker;
 import top.dpdaidai.mn.service.v5.PetStoreService;
@@ -27,22 +33,35 @@ public class ReflectiveMethodInvocationTest {
     private AspectJAfterReturningAdvice afterReturningAdvice = null;
     private AspectJAfterThrowingAdvice throwingAdvice = null;
     private PetStoreService petStoreService = null;
-    private TransactionManager transactionManager;
+
+    private DefaultBeanFactory defaultBeanFactory = null;
+    private AspectInstanceFactory aspectInstanceFactory = null;
+
 
     @Before
     public void setUp() throws Exception {
+
+
+        defaultBeanFactory = new DefaultBeanFactory();
+        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(defaultBeanFactory);
+        Resource resource = new ClassPathResource("petstore-v5.xml");
+        reader.loadBeanDefinitions(resource);
+
+        aspectInstanceFactory = new AspectInstanceFactory();
+        aspectInstanceFactory.setBeanFactory(defaultBeanFactory);
+        aspectInstanceFactory.setAspectBeanName("transactionManager");
+
         petStoreService = new PetStoreService();
-        transactionManager = new TransactionManager();
         MessageTracker.clearMsgs();
 
         beforeAdvice = new AspectJBeforeAdvice(
-                TransactionManager.class.getMethod("start"), transactionManager, null);
+                TransactionManager.class.getMethod("start"), aspectInstanceFactory, null);
 
         afterReturningAdvice = new AspectJAfterReturningAdvice(
-                TransactionManager.class.getMethod("commit"), transactionManager, null);
+                TransactionManager.class.getMethod("commit"), aspectInstanceFactory, null);
 
         throwingAdvice = new AspectJAfterThrowingAdvice(
-                TransactionManager.class.getMethod("rollback"), transactionManager, null);
+                TransactionManager.class.getMethod("rollback"), aspectInstanceFactory, null);
     }
 
     @Test

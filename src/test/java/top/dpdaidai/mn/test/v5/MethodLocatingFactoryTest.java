@@ -30,7 +30,7 @@ public class MethodLocatingFactoryTest {
         methodLocatingFactory.setMethodName("start");
         methodLocatingFactory.setBeanFactory(defaultBeanFactory);
 
-        Method method = methodLocatingFactory.getMethod();
+        Method method = methodLocatingFactory.getObject();
 
         Assert.assertTrue(TransactionManager.class.equals(method.getDeclaringClass()));
 

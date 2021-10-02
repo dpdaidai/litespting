@@ -2,6 +2,8 @@ package top.dpdaidai.mn.aop.config;
 
 import top.dpdaidai.mn.beans.BeanUtils;
 import top.dpdaidai.mn.beans.factory.BeanFactory;
+import top.dpdaidai.mn.beans.factory.BeanFactoryAware;
+import top.dpdaidai.mn.beans.factory.FactoryBean;
 import top.dpdaidai.mn.util.StringUtils;
 
 import java.lang.reflect.Method;
@@ -14,7 +16,7 @@ import java.lang.reflect.Method;
  * @Date 9/27/21 5:03 PM
  * @Version 1.0
  */
-public class MethodLocatingFactory {
+public class MethodLocatingFactory implements FactoryBean<Method>, BeanFactoryAware {
 
     private String targetBeanName;
 
@@ -46,8 +48,12 @@ public class MethodLocatingFactory {
 
     }
 
-    public Method getMethod() {
+    public Method getObject() throws Exception {
         return method;
+    }
+
+    public Class<?> getObjectType() {
+        return method.getClass();
     }
 }
 

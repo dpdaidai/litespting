@@ -2,6 +2,7 @@ package top.dpdaidai.mn.aop.aspect;
 
 import top.dpdaidai.mn.aop.Advice;
 import top.dpdaidai.mn.aop.Pointcut;
+import top.dpdaidai.mn.aop.config.AspectInstanceFactory;
 
 import java.lang.reflect.Method;
 
@@ -24,9 +25,12 @@ public abstract class AbstractAspectJAdvice implements Advice {
     protected Method adviceMethod;
 
     /**
-     * 执行切面方法的对象
+     * 执行切面方法的对象 ,
+     * 现在由AspectInstanceFactory替换 , 该类为切面实例生成工厂 , AbstractAspectJAdvice 不再直接持有切面对象实例
      */
-    protected Object adviceObject;
+//    protected Object adviceObject;
+    protected AspectInstanceFactory aspectInstanceFactory;
+
 
     /**
      * 切点 :
@@ -36,9 +40,9 @@ public abstract class AbstractAspectJAdvice implements Advice {
      */
     protected Pointcut pointcut;
 
-    public AbstractAspectJAdvice(Method adviceMethod, Object adviceObject, Pointcut pointcut) {
+    public AbstractAspectJAdvice(Method adviceMethod, AspectInstanceFactory aspectInstanceFactory, Pointcut pointcut) {
         this.adviceMethod = adviceMethod;
-        this.adviceObject = adviceObject;
+        this.aspectInstanceFactory = aspectInstanceFactory;
         this.pointcut = pointcut;
     }
 
@@ -49,7 +53,7 @@ public abstract class AbstractAspectJAdvice implements Advice {
      * @throws Throwable
      */
     public void invokeAdviceMethod() throws Throwable {
-        adviceMethod.invoke(adviceObject);
+        adviceMethod.invoke(aspectInstanceFactory.getAspectInstance());
     }
 
     public Pointcut getPointcut() {
