@@ -14,7 +14,8 @@ import top.dpdaidai.mn.test.proxy.javaDynamicProxy.JavaDynamicProxyTest;
         ReflectiveMethodInvocationTest.class,
         JavaDynamicProxyTest.class,
         DynamicProxyHandlerTest.class,
-        CglibTest.class
+        CglibTest.class,
+        BeanDefinitionTestV5.class
 })
 public class V5AllTests {
 

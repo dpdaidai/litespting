@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import top.dpdaidai.mn.aop.config.ConfigBeanDefinitionParser;
 import top.dpdaidai.mn.beans.ConstructorArgument;
 import top.dpdaidai.mn.beans.exception.BeanDefinitionStoreException;
 import top.dpdaidai.mn.beans.factory.BeanDefinition;
@@ -47,6 +48,8 @@ public class XmlBeanDefinitionReader {
 
     public static final String CONTEXT_NAMESPACE_URI = "http://www.springframework.org/schema/context";
 
+    public static final String AOP_NAMESPACE_URI = "http://www.springframework.org/schema/aop";
+
     private static final String BASE_PACKAGE_ATTRIBUTE = "base-package";
 
     BeanDefinitionRegistry registerBeanDefinition;
@@ -66,13 +69,15 @@ public class XmlBeanDefinitionReader {
             Element rootElement = document.getRootElement();
             Iterator<Element> iterator = rootElement.elementIterator();
             while (iterator.hasNext()) {
-                Element beanElement = iterator.next();
-                String namespaceUri = beanElement.getNamespaceURI();
+                Element childElement = iterator.next();
+                String namespaceUri = childElement.getNamespaceURI();
 
                 if (this.isDefaultNamespace(namespaceUri)) {
-                    parseDefaultElement(beanElement); //普通的bean
+                    parseDefaultElement(childElement); //普通的bean
                 } else if (this.isContextNamespace(namespaceUri)) {
-                    parseComponentElement(beanElement); //例如<context:component-scan>
+                    parseComponentElement(childElement); //例如<context:component-scan>
+                } else if (this.isAOPNamespace(namespaceUri)) {
+                    parseAOPElement(childElement);
                 }
 
             }
@@ -121,6 +126,11 @@ public class XmlBeanDefinitionReader {
         classPathBeanDefinitionScanner.doScan(basePackage);
     }
 
+    private void parseAOPElement(Element aopElement) {
+        ConfigBeanDefinitionParser configBeanDefinitionParser = new ConfigBeanDefinitionParser();
+        configBeanDefinitionParser.parse(aopElement, this.registerBeanDefinition);
+    }
+
     //判断element的类型
     //BEANS_NAMESPACE_URI = "http://www.springframework.org/schema/beans" 属于默认bean类型
     public boolean isDefaultNamespace(String namespaceUri) {
@@ -130,6 +140,10 @@ public class XmlBeanDefinitionReader {
     //CONTEXT_NAMESPACE_URI = "http://www.springframework.org/schema/context" 属于包类型
     public boolean isContextNamespace(String namespaceUri) {
         return (!StringUtils.hasLength(namespaceUri) || CONTEXT_NAMESPACE_URI.equals(namespaceUri));
+    }
+
+    public boolean isAOPNamespace(String namespaceUri){
+        return (!StringUtils.hasLength(namespaceUri) || AOP_NAMESPACE_URI.equals(namespaceUri));
     }
 
 

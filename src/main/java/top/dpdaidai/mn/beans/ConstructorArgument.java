@@ -21,6 +21,10 @@ public class ConstructorArgument {
         this.argumentValues.add(valueHolder);
     }
 
+    public void addArgumentValue(Object object) {
+        this.argumentValues.add(new ValueHolder(object));
+    }
+
     public List<ValueHolder> getArgumentValues() {
         return Collections.unmodifiableList(this.argumentValues);
     }

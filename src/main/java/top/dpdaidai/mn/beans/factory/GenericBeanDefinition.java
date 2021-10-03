@@ -14,12 +14,20 @@ public class GenericBeanDefinition implements BeanDefinition {
     private String scope = SCOPE_DEFAULT;
     private Class<?> beanClass;
 
+    //表名该BeanDefinition是否是合成的
+    private boolean isSynthetic;
+
     private ConstructorArgument constructorArgument = new ConstructorArgument();
 
     private List<PropertyValue> propertyValueList = new ArrayList<PropertyValue>();
 
     public GenericBeanDefinition() {
 
+    }
+
+    public GenericBeanDefinition(Class<?> beanClass) {
+        this.beanClass = beanClass;
+        this.beanClassName = beanClass.getName();
     }
 
     public GenericBeanDefinition(String id, String beanClassName) {
@@ -96,6 +104,14 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     public boolean hasBeanClass() {
         return this.beanClass != null;
+    }
+
+    public boolean isSynthetic() {
+        return this.isSynthetic;
+    }
+
+    public void setSynthetic(boolean isSynthetic) {
+        this.isSynthetic = isSynthetic;
     }
 
 }
