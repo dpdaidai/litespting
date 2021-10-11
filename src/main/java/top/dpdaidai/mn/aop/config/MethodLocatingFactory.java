@@ -10,7 +10,13 @@ import java.lang.reflect.Method;
 
 /**
  * 方法解析工厂
- * 根据类名 , 方法名 , 解析得到method
+ * 根据 beanID 和 bean的方法名 , 解析得到目标方法method
+ *
+ * 当
+ * targetBeanName = "transactionManager"
+ * methodName = "start"
+ * 此时 : method = getObject()
+ * 效果等价于 : method = TransactionManager.class.getMethod("start")
  *
  * @Author chenpantao
  * @Date 9/27/21 5:03 PM

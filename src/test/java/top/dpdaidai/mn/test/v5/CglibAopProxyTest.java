@@ -75,7 +75,7 @@ public class CglibAopProxyTest {
         PetStoreService petStoreServiceProxy = (PetStoreService) cglibProxyFactory.getProxy();
 
         petStoreServiceProxy.placeOrder();
-        petStoreServiceProxy.toString();
+//        petStoreServiceProxy.toString();
 
         List<String> msgs = MessageTracker.getMsgs();
         Assert.assertEquals(3, msgs.size());

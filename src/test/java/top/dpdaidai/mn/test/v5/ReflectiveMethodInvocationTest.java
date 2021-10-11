@@ -5,11 +5,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import top.dpdaidai.mn.aop.aspect.AspectJAfterReturningAdvice;
-import top.dpdaidai.mn.aop.aspect.AspectJBeforeAdvice;
 import top.dpdaidai.mn.aop.aspect.AspectJAfterThrowingAdvice;
+import top.dpdaidai.mn.aop.aspect.AspectJBeforeAdvice;
 import top.dpdaidai.mn.aop.config.AspectInstanceFactory;
 import top.dpdaidai.mn.aop.framework.ReflectiveMethodInvocation;
-import top.dpdaidai.mn.beans.factory.BeanFactory;
 import top.dpdaidai.mn.beans.factory.support.DefaultBeanFactory;
 import top.dpdaidai.mn.beans.factory.support.XmlBeanDefinitionReader;
 import top.dpdaidai.mn.core.io.ClassPathResource;
@@ -67,18 +66,25 @@ public class ReflectiveMethodInvocationTest {
     @Test
     public void testReflectiveMethodInvocation1() throws Throwable {
         ArrayList<MethodInterceptor> methodInterceptors = new ArrayList<MethodInterceptor>();
-        //不关注拦截器假如的顺序
+        //不关注拦截器加入的顺序
         methodInterceptors.add(afterReturningAdvice);
         methodInterceptors.add(beforeAdvice);
 
         Method placeOrderMethod = PetStoreService.class.getMethod("placeOrder");
 
+        //ReflectiveMethodInvocation初始化需要的参数
+        //     1  切点对象 targetObject  : petStoreService
+        //     2  切点方法 targetMethod  : placeOrderMethod
+        //     3  切点方法参数 arguments  : placeOrderMethod 的参数
+        //     4  关联该切点的拦截器 interceptors  : 参与拦截调用链的所有拦截器
         ReflectiveMethodInvocation reflectiveMethodInvocation = new ReflectiveMethodInvocation(
                 petStoreService,
                 placeOrderMethod,
                 new Object[0],
                 methodInterceptors);
 
+        //1  执行petStoreService的placeOrder()方法
+        //2  也执行拦截器集合methodInterceptors的拦截方法
         reflectiveMethodInvocation.proceed();
 
         List<String> msgs = MessageTracker.getMsgs();

@@ -26,7 +26,7 @@ import java.lang.reflect.Proxy;
  *   5  包含了 代理类的构造器方法 , 该方法需要一个参数InvocationHandler
  *
  * 当使用代理类的调用接口方法时 , 实际上是通过代理类调用了 InvocationHandler的invoke()方法
- * 所以在invoke中 , 调用this , 并不会返回代理类 , 而是返回了InvocationHandler这个类的对象
+ * 所以在DynamicProxyHandler的invoke()中 , 调用this , 并不会返回代理类 , 而是返回了DynamicProxyHandler这个类的对象
  *
  * @Author chenpantao
  * @Date 9/28/21 10:58 PM
@@ -54,6 +54,16 @@ public class DynamicProxyHandlerTest {
         //② 获取指定的代理类Class的特定Constructor，该构造方法要求具有唯一一个类型为InvocationHandler的参数。
         //③ 通过反射创建指定的代理类，这里会传入我们自己实现的 DynamicSubject 类（InvocationHandler 接口的实现类）作为构造方法的参数。
         Object instance = Proxy.newProxyInstance(classLoader, interfaces, proxyHandler);
+        /**
+         * 事实上 , 生成instance的类属性 : public final class $Proxy0 extends Proxy implements People
+         * 这个代理类将people对象的所有类都重写了一遍 , 调用也是调用的代理类的方法 , 每个方法的实现都差不多 :
+         * 例如sayHello() : super.h.invoke(this, m3, new Object[]{var1});
+         *      super : Proxy
+         *      h : InvocationHandler
+         * 那么其实就是执行了 InvocationHandler.invoke()方法
+         *
+         */
+
         People proxyPeople = (People) instance;
 
         proxyPeople.sayHello("cpt");

@@ -13,7 +13,7 @@ import java.lang.reflect.Proxy;
  * Java标准库提供了一种动态代理（Dynamic Proxy）的机制：可以在运行期动态创建某个interface的实例。
  *
  * 先定义了接口Hello，但是我们并不去编写实现类，而是直接通过JDK提供的一个Proxy.newProxyInstance()创建了一个Hello接口对象。
- * 这种没有实现类但是在运行期动态创建了一个接口对象的方式，我们称为动态代码。
+ * 这种没有实现类但是在运行期动态创建了一个接口对象的方式，我们称为动态代理。
  *
  * JDK提供的动态创建接口对象的方式，就叫动态代理。
  *
@@ -43,19 +43,24 @@ public class JavaDynamicProxyTest {
                     System.out.println("Good morning , " + args[0]);
                 } else if (method.getName().equals("toString")){
                     System.out.println(this.getClass());
+                    //class top.dpdaidai.mn.test.proxy.javaDynamicProxy.JavaDynamicProxyTest$1
+                    //这是匿名类
                     return method.invoke(this, args);
                 }
                 return null;
             }
         };
 
+        //根据Hello接口 和 InvocationHandler , 在运行时动态生成一个Hello的子类字节码
         Hello hello = (Hello) Proxy.newProxyInstance(
                 Hello.class.getClassLoader(), new Class[]{Hello.class}, handler);
         hello.morning("cpt");
 
-        System.out.println(hello.toString());
+        System.out.println(hello.toString());  //top.dpdaidai.mn.test.proxy.javaDynamicProxy.JavaDynamicProxyTest$1@4dcbadb4
 
         System.out.println(hello.getClass());
+        //class top.dpdaidai.mn.test.proxy.javaDynamicProxy.$Proxy4
+        //这是动态代理生成的类
     }
 
 }

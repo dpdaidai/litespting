@@ -1,6 +1,7 @@
 package top.dpdaidai.mn.test.proxy.cglibProxy;
 
 import org.junit.Test;
+import org.springframework.cglib.core.DebuggingClassWriter;
 import org.springframework.cglib.proxy.Callback;
 import org.springframework.cglib.proxy.CallbackFilter;
 import org.springframework.cglib.proxy.Enhancer;
@@ -20,9 +21,6 @@ public class CglibTest {
 
     @Test
     public void test() {
-
-        //配置保存cglib运行时动态生成的字节码文件
-//        System.setProperty(DebuggingClassWriter.DEBUG_LOCATION_PROPERTY, "cglib");
 
         TransactionInterceptor transactionInterceptor = new TransactionInterceptor();
 
@@ -53,13 +51,37 @@ public class CglibTest {
     /**
      *
      * 4、回调过滤器CallbackFilter
-     *
      * 在CGLib回调时可以设置对不同方法执行不同的回调逻辑，或者根本不执行回调。
-     *
      * 在JDK动态代理中并没有类似的功能，对InvocationHandler接口方法的调用对代理类内的所以方法都有效。
      *
+     * 代理类 Student$$EnhancerByCGLIB$$7962d475 中的sayHello()解析
+     *
+     * //继承Student
+     * public class Student$$EnhancerByCGLIB$$7962d475 extends Student implements Factory{
+     *
+     * //代理方法sayHello
+     * public final void sayHello(String var1) {
+     *
+     *         //根据 TargetMethodCallbackFilter.accept(Method method)方法 , sayHello()应该使用第0个MethodInterceptor
+     *         //这里就是要找到 CALLBACK_0
+     *         MethodInterceptor var10000 = this.CGLIB$CALLBACK_0;
+     *         if (var10000 == null) {
+     *             CGLIB$BIND_CALLBACKS(this);
+     *             var10000 = this.CGLIB$CALLBACK_0;
+     *         }
+     *
+     *         //如果MethodInterceptor不为空 , 那么调用MethodInterceptor.intercept()方法 , 完成代理功能
+     *         if (var10000 != null) {
+     *             var10000.intercept(this, CGLIB$sayHello$1$Method, new Object[]{var1}, CGLIB$sayHello$1$Proxy);
+     *         } else {
+     *             super.sayHello(var1);
+     *         }
+     *     }
+     *}
      */
     public void testFilter() {
+        //配置保存cglib运行时动态生成的字节码文件
+//        System.setProperty(DebuggingClassWriter.DEBUG_LOCATION_PROPERTY, "cglib");
 
         Enhancer enhancer = new Enhancer();
 
@@ -87,6 +109,7 @@ public class CglibTest {
         enhancer.setCallbacks(callbackList);
         enhancer.setCallbackFilter(targetMethodCallbackFilter);
 
+        // 根据上述回调规则 , 创建代理类字节码
         Student studentProxy = (Student)enhancer.create();
 
         //callback : 被自定义拦截

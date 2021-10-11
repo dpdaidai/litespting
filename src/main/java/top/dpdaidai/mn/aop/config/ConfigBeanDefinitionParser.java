@@ -82,6 +82,8 @@ public class ConfigBeanDefinitionParser {
      */
     private void parseAspect(Element aspectElement, BeanDefinitionRegistry registry) {
         String aspectId = aspectElement.attributeValue(ID);
+
+        //transactionManager
         String aspectRefName = aspectElement.attributeValue(REF);
 
         List<Element> elements = aspectElement.elements();
@@ -90,11 +92,11 @@ public class ConfigBeanDefinitionParser {
         boolean adviceFoundReady = false;
 
         //解析 before , after-returning , after-throwing
-        for (Element element : elements) {
+        for (Element adviceElement : elements) {
 
             //判断是否是advice
-            if (isAdviceNode(element)) {
-                parseAdvice(aspectRefName, element, registry);
+            if (isAdviceNode(adviceElement)) {
+                parseAdvice(aspectRefName, adviceElement, registry);
             }
         }
 
@@ -119,7 +121,7 @@ public class ConfigBeanDefinitionParser {
      */
     private GenericBeanDefinition parseAdvice(String aspectName, Element adviceElement, BeanDefinitionRegistry registry) {
 
-        // 第一个参数
+        // 第一个参数 : 用来获取根据aspectName和methodName 反射获取 aspectMethod (例如start()方法)
         GenericBeanDefinition methodBeanDefinition = new GenericBeanDefinition(MethodLocatingFactory.class);
 
         //合成beanDefinition的标志
@@ -129,7 +131,7 @@ public class ConfigBeanDefinitionParser {
         propertyValues.add(new PropertyValue("targetBeanName", aspectName));
         propertyValues.add(new PropertyValue("methodName", adviceElement.attributeValue("method")));
 
-        //第三个参数
+        //第三个参数 : AspectInstanceFactory 用来从beanFactory中 , 根据aspectName 获取 aspect实例transactionManager
         GenericBeanDefinition aspectFactoryDef = new GenericBeanDefinition(AspectInstanceFactory.class);
         aspectFactoryDef.getPropertyValues().add(new PropertyValue("aspectBeanName", aspectName));
         aspectFactoryDef.setSynthetic(true);

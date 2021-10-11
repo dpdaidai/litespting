@@ -8,9 +8,14 @@ import java.lang.reflect.Method;
  *
  * 4、回调过滤器CallbackFilter
  *
- *在CGLib回调时可以设置对不同方法执行不同的回调逻辑，或者根本不执行回调。
+ * 在CGLib回调时可以设置对不同方法执行不同的回调逻辑，或者根本不执行回调。
  *
  * 在JDK动态代理中并没有类似的功能，对InvocationHandler接口方法的调用对代理类内的所以方法都有效。
+ *
+ * =================
+ * 在创建动态代理类时 , 会将代理类每个方法放入accept()中进行比对 , 来确定每个类的回调方法
+ * 动态代理类创建好后 , 每个方法调用哪个callback已经写在字节码里面了
+ * =================
  *
  */
 public class TargetMethodCallbackFilter implements CallbackFilter {

@@ -12,6 +12,9 @@ import top.dpdaidai.mn.util.StringUtils;
  */
 public class AspectInstanceFactory implements BeanFactoryAware {
 
+    /**
+     * 切面对象的beanName , 示例中的transactionManager
+     */
     private String aspectBeanName;
 
     private BeanFactory beanFactory;

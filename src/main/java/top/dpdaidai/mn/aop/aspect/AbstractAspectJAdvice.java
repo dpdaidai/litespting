@@ -20,13 +20,14 @@ import java.lang.reflect.Method;
 public abstract class AbstractAspectJAdvice implements Advice {
 
     /**
-     * 切面方法
+     * 切面方法 , 例如 示例中 TransactionManager 的"start" , "commit" , "rollback"方法
      */
     protected Method adviceMethod;
 
     /**
-     * 执行切面方法的对象 ,
+     * 执行切面方法的对象实例 ,
      * 现在由AspectInstanceFactory替换 , 该类为切面实例生成工厂 , AbstractAspectJAdvice 不再直接持有切面对象实例
+     * 其实也只是从beanFactory中根据beanId获取bean
      */
 //    protected Object adviceObject;
     protected AspectInstanceFactory aspectInstanceFactory;
@@ -48,7 +49,7 @@ public abstract class AbstractAspectJAdvice implements Advice {
 
 
     /**
-     * 切面方法 , 这里实现的是没有参数的切面方法
+     * 切面方法 , 当前只实现了没有参数的切面方法
      *
      * @throws Throwable
      */

@@ -56,7 +56,14 @@ public class ReflectiveMethodInvocation implements MethodInvocation {
     }
 
     /**
-     * 看类注释
+     * 拦截器调用链的起点 , 它的行为 :
+     * 1  一定会执行 targetMethod.invoke(targetObject, arguments)
+     * 2  在执行目标方法 targetMethod 时 , 会按加入顺序执行 链中的所有拦截器 interceptorList 的切面方法
+     * 3  根据以下代码可知 执行顺序 :
+     *          1    AspectJBeforeAdvice >  targetMethod() >  AspectJAfterReturningAdvice / AspectJAfterThrowingAdvice
+     *          2    AspectJBeforeAdvice : 先加入interceptorList的拦截器先执行
+     *          3    AspectJAfterReturningAdvice / AspectJAfterThrowingAdvice : 先加入interceptorList的拦截器后执行
+     *
      * @return
      * @throws Throwable
      */
