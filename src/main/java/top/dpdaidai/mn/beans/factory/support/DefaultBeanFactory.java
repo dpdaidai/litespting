@@ -4,9 +4,9 @@ import top.dpdaidai.mn.beans.SimpleTypeConverter;
 import top.dpdaidai.mn.beans.exception.BeanCreationException;
 import top.dpdaidai.mn.beans.exception.NoSuchBeanDefinitionException;
 import top.dpdaidai.mn.beans.factory.BeanDefinition;
+import top.dpdaidai.mn.beans.factory.BeanFactoryAware;
 import top.dpdaidai.mn.beans.factory.PropertyValue;
 import top.dpdaidai.mn.beans.factory.config.BeanPostProcessor;
-import top.dpdaidai.mn.beans.factory.config.ConfigurableBeanFactory;
 import top.dpdaidai.mn.beans.factory.config.DependencyDescriptor;
 import top.dpdaidai.mn.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import top.dpdaidai.mn.util.ClassUtils;
@@ -24,8 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date 9/1/21 2:40 PM
  * @Version 1.0
  */
-public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
-        implements ConfigurableBeanFactory, BeanDefinitionRegistry {
+public class DefaultBeanFactory extends AbstractBeanFactory
+        implements BeanDefinitionRegistry {
 
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>();
 
@@ -70,11 +70,30 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
 
     public Class<?> getType(String beanID) throws NoSuchBeanDefinitionException {
         BeanDefinition beanDefinition = this.getBeanDefinition(beanID);
-        if(beanDefinition == null){
+        if (beanDefinition == null) {
             throw new NoSuchBeanDefinitionException(beanID);
         }
         resolveBeanClass(beanDefinition);
         return beanDefinition.getBeanClass();
+    }
+
+    public List<Object> getBeansByType(Class<?> classType) {
+        List<Object> result = new ArrayList<Object>();
+        List<String> beanIDs = this.getBeanIDsByType(classType);
+        for (String beanID : beanIDs) {
+            result.add(this.getBean(beanID));
+        }
+        return result;
+    }
+
+    private List<String> getBeanIDsByType(Class<?> classType) {
+        List<String> result = new ArrayList<String>();
+        for (String beanName : beanDefinitionMap.keySet()) {
+            if (classType.isAssignableFrom(this.getType(beanName))) {
+                result.add(beanName);
+            }
+        }
+        return result;
     }
 
     /**
@@ -82,12 +101,15 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
      * @param beanDefinition
      * @return
      */
-    private Object createBean(BeanDefinition beanDefinition) {
+    protected Object createBean(BeanDefinition beanDefinition) {
 
         //初始化bean
         Object bean = instantiateBean(beanDefinition);
         //填充属性
         populateBean(beanDefinition, bean);
+
+        bean = initializeBean(beanDefinition, bean);
+
         return bean;
     }
 
@@ -167,6 +189,19 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
 
     }
 
+    protected Object initializeBean(BeanDefinition beanDefinition, Object bean) {
+        invokeAwareMethod(bean);
+        //TODO 对bean做初始化
+        //创建代理
+
+        return bean;
+    }
+
+    private void invokeAwareMethod(final Object bean) {
+        if (bean instanceof BeanFactoryAware) {
+            ((BeanFactoryAware) bean).setBeanFactory(this);
+        }
+    }
 
     public void setBeanClassloader(ClassLoader classloader) {
         this.classLoader = classloader;

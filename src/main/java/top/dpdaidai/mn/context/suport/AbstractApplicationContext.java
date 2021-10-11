@@ -8,6 +8,8 @@ import top.dpdaidai.mn.beans.factory.support.XmlBeanDefinitionReader;
 import top.dpdaidai.mn.context.ApplicationContext;
 import top.dpdaidai.mn.core.io.Resource;
 
+import java.util.List;
+
 /**
  * @Author chenpantao
  * @Date 9/2/21 3:14 PM
@@ -56,5 +58,9 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     public Class<?> getType(String beanID) throws NoSuchBeanDefinitionException {
         return this.defaultBeanFactory.getType(beanID);
+    }
+
+    public List<Object> getBeansByType(Class<?> classType) {
+        return this.defaultBeanFactory.getBeansByType(classType);
     }
 }

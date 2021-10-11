@@ -37,6 +37,7 @@ public class CglibAopProxyTest {
 
     @Before
     public void setUp() throws Exception {
+        MessageTracker.clearMsgs();
 
         defaultBeanFactory = new DefaultBeanFactory();
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(defaultBeanFactory);

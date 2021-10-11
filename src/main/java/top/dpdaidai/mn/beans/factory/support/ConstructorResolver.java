@@ -23,10 +23,10 @@ public class ConstructorResolver {
 
     protected final Log logger = LogFactory.getLog(getClass());
 
-    private final ConfigurableBeanFactory beanFactory;
+    private final AbstractBeanFactory beanFactory;
 
 
-    public ConstructorResolver(ConfigurableBeanFactory beanFactory) {
+    public ConstructorResolver(AbstractBeanFactory beanFactory) {
         this.beanFactory = beanFactory;
     }
 
@@ -93,8 +93,8 @@ public class ConstructorResolver {
      * 检查参数类型数组和BeadDefinition中的参数数组是否匹配
      * 匹配则返回true
      *
-     * @param parameterTypes
-     * @param valueHolders
+     * @param parameterTypes  : 参数类型数组
+     * @param valueHolders    : 构造器参数数组 , 包含参数的名称 , 类型 和 值
      * @param argsToUse
      * @return
      */
@@ -108,11 +108,13 @@ public class ConstructorResolver {
 
         for (int i = 0; i < parameterTypes.length; i++) {
             ConstructorArgument.ValueHolder valueHolder = valueHolders.get(i);
-            //获取参数的值，可能是TypedStringValue, 也可能是RuntimeBeanReference
+            //获取参数的值，获得真正的值需要根据参数类型再转换
+            // 1  可能是TypedStringValue , 则返回String字符串 .
+            //      如果parameterTypes[i] 不是字符串是基本类型 , 那么还需要经过typeConverter转换为基本类型
+            // 2  也可能是RuntimeBeanReference , 那么通过beanFactory根据beanID 获取RuntimeBeanReference实例
+            // 3  还可能是BeanDefinition , 那么需要由beanFactory 根据bean定义创建一个内部bean (innerBeanName)
             Object originalValue = valueHolder.getValue();
-            //获得真正的值
-            //RuntimeBeanReference解析为对象
-            //TypedStringValue还需要再转换
+
             Object resolvedValue = valueResolver.resolveValueIfNecessary(originalValue);
 
             try {

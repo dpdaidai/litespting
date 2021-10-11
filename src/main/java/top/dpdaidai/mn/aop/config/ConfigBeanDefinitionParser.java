@@ -17,6 +17,9 @@ import top.dpdaidai.mn.util.StringUtils;
 import java.util.List;
 
 /**
+ *
+ * 主要解析<aop:config>下的xml元素
+ *
  * @Author chenpantao
  * @Date 10/2/21 11:29 PM
  * @Version 1.0
@@ -131,7 +134,7 @@ public class ConfigBeanDefinitionParser {
         propertyValues.add(new PropertyValue("targetBeanName", aspectName));
         propertyValues.add(new PropertyValue("methodName", adviceElement.attributeValue("method")));
 
-        //第三个参数 : AspectInstanceFactory 用来从beanFactory中 , 根据aspectName 获取 aspect实例transactionManager
+        //第二个参数 : AspectInstanceFactory 用来从beanFactory中 , 根据aspectName 获取 aspect实例transactionManager
         GenericBeanDefinition aspectFactoryDef = new GenericBeanDefinition(AspectInstanceFactory.class);
         aspectFactoryDef.getPropertyValues().add(new PropertyValue("aspectBeanName", aspectName));
         aspectFactoryDef.setSynthetic(true);
@@ -169,9 +172,9 @@ public class ConfigBeanDefinitionParser {
         Class<?> adviceClass = getAdviceClass(adviceElement);
         GenericBeanDefinition adviceBeanDefinition = new GenericBeanDefinition(adviceClass);
 
-        //设置adviceBeanDefinition的propertyValue
-        List<PropertyValue> propertyValues = adviceBeanDefinition.getPropertyValues();
-        propertyValues.add(new PropertyValue(ASPECT_NAME_PROPERTY, aspectName));
+        //设置adviceBeanDefinition的propertyValue , 这个似乎没用 , 暂时注释掉
+//        List<PropertyValue> propertyValues = adviceBeanDefinition.getPropertyValues();
+//        propertyValues.add(new PropertyValue(ASPECT_NAME_PROPERTY, aspectName));
 
         //获取adviceBeanDefinition的构造器
         ConstructorArgument constructorArgument = adviceBeanDefinition.getConstructorArgument();
@@ -179,23 +182,25 @@ public class ConfigBeanDefinitionParser {
         //第一个参数 : advice 的切面方法
         constructorArgument.addArgumentValue(methodDefBeanDefinition);
 
-        //第二个参数 : 切面表达式
-        Object pointcutProperty = parsePointcutProperty(adviceElement);
-        if (pointcutProperty instanceof BeanDefinition) {
-            constructorArgument.addArgumentValue(pointcutProperty);
-        } else if (pointcutProperty instanceof String) {
-            RuntimeBeanReference pointcutRef = new RuntimeBeanReference((String) pointcutProperty);
-            constructorArgument.addArgumentValue(pointcutRef);
-        }
-
-        //第三个参数 : AspectInstanceFactory , 通过 beanFactory , 根据beanDefinition取出 aspect 实例
+        //第二个参数 : AspectInstanceFactory , 通过 beanFactory , 根据beanDefinition取出 aspect 实例
         constructorArgument.addArgumentValue(aspectFactoryDefBeanDefinition);
+
+        //第三个参数 : 切面表达式
+        Object pointcutProperty = parsePointcutProperty(adviceElement);
+        constructorArgument.addArgumentValue(pointcutProperty);
 
         return adviceBeanDefinition;
     }
 
     /**
-     * 根据advice解析 pointcut-ref
+     * 根据advice解析 这个拦截器作用在什么范围上
+     * 1  如果pointcut-ref 有值 , 那么它的作用范围在pointcut-ref关联的表达式对象上 ,
+     *      需要从beanFactory中根据beanID取到关联对象AspectExpressionPointcut
+     *      <aop:pointcut id="placeOrder" expression="execution(* top.dpdaidai.mn.service.v5.*.placeOrder(..))"/>
+     *
+     * 2  如果是pointcut有值 , 那么这个拦截器作为范围为自定义的表达式上 ,
+     *      需要根据表达式自建AspectExpressionPointcut 的 beanDefinition,
+     *      在初始化bean时 , 会根据beanDefinition创建AspectExpressionPointcut
      *
      * @param adviceElement
      *             <aop:before pointcut-ref="placeOrder" method="start"/>
@@ -207,8 +212,7 @@ public class ConfigBeanDefinitionParser {
         String pointcutExpression = adviceElement.attributeValue(POINTCUT);
         String pointcutRef = adviceElement.attributeValue(POINTCUT_REF);
 
-        //如果是advice内含有表达式 , 那么应该会和这个标签冲突
-        // <aop:pointcut id="placeOrder" expression="execution(* top.dpdaidai.mn.service.v5.*.placeOrder(..))"/>
+        //根据pointcutRef 或者 pointcutExpression 选择不同的 pointcutExpression 的创建方式
         if (pointcutExpression == null && pointcutRef == null) {
             return null;
         } else if (pointcutExpression != null) {
@@ -218,8 +222,8 @@ public class ConfigBeanDefinitionParser {
             if (!StringUtils.hasText(pointcutRef)) {
                 return null;
             }
-            return pointcutRef;
-        }else {
+            return new RuntimeBeanReference(pointcutRef);
+        } else {
             return null;
         }
     }
