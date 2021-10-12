@@ -1,5 +1,6 @@
 package top.dpdaidai.mn.context.suport;
 
+import top.dpdaidai.mn.aop.aspect.AspectJAutoProxyCreator;
 import top.dpdaidai.mn.beans.exception.NoSuchBeanDefinitionException;
 import top.dpdaidai.mn.beans.factory.annotation.AutowiredAnnotationProcessor;
 import top.dpdaidai.mn.beans.factory.config.ConfigurableBeanFactory;
@@ -54,6 +55,10 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         AutowiredAnnotationProcessor autowiredAnnotationProcessor = new AutowiredAnnotationProcessor();
         autowiredAnnotationProcessor.setBeanFactory(beanFactory);
         beanFactory.addBeanPostProcessor(autowiredAnnotationProcessor);
+
+        AspectJAutoProxyCreator aspectJAutoProxyCreator = new AspectJAutoProxyCreator();
+        aspectJAutoProxyCreator.setBeanFactory(beanFactory);
+        beanFactory.addBeanPostProcessor(aspectJAutoProxyCreator);
     }
 
     public Class<?> getType(String beanID) throws NoSuchBeanDefinitionException {

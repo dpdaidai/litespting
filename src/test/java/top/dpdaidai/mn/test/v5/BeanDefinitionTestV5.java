@@ -90,14 +90,7 @@ public class BeanDefinitionTestV5 {
 
         //构造函数第二个参数
         {
-            RuntimeBeanReference reference = (RuntimeBeanReference)argumentValues.get(1).getValue();
-            Assert.assertEquals("placeOrder", reference.getBeanID());
-
-        }
-
-        //构造函数第三个参数
-        {
-            BeanDefinition aspectFactoryBeanDefinition = (BeanDefinition)argumentValues.get(2).getValue();
+            BeanDefinition aspectFactoryBeanDefinition = (BeanDefinition)argumentValues.get(1).getValue();
             Assert.assertTrue(aspectFactoryBeanDefinition.isSynthetic());
             Assert.assertTrue(aspectFactoryBeanDefinition.getBeanClass().equals(AspectInstanceFactory.class));
 
@@ -107,6 +100,12 @@ public class BeanDefinitionTestV5 {
 
         }
 
+        //构造函数第三个参数
+        {
+            RuntimeBeanReference reference = (RuntimeBeanReference)argumentValues.get(2).getValue();
+            Assert.assertEquals("placeOrder", reference.getBeanID());
+
+        }
     }
 
 }

@@ -191,10 +191,21 @@ public class DefaultBeanFactory extends AbstractBeanFactory
 
     protected Object initializeBean(BeanDefinition beanDefinition, Object bean) {
         invokeAwareMethod(bean);
-        //TODO 对bean做初始化
+        //TODO 对bean做初始化 , 暂不实现
         //创建代理
+        if (!beanDefinition.isSynthetic()) {
+            return applyBeanPostProcessorsAfterInitialization(bean, beanDefinition.getID());
+        }
 
         return bean;
+    }
+
+    public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            existingBean = beanPostProcessor.afterInitialization(existingBean, beanName);
+        }
+
+        return existingBean;
     }
 
     private void invokeAwareMethod(final Object bean) {
