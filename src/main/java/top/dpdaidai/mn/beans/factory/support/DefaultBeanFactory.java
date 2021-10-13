@@ -104,6 +104,8 @@ public class DefaultBeanFactory extends AbstractBeanFactory
     protected Object createBean(BeanDefinition beanDefinition) {
 
         //初始化bean
+        //如果有构造器参数 , 那么使用构造器参数初始化bean
+        //没有则new一个bean , 等待populateBean() 和 initializeBean()填充属性
         Object bean = instantiateBean(beanDefinition);
         //填充属性
         populateBean(beanDefinition, bean);
@@ -135,9 +137,8 @@ public class DefaultBeanFactory extends AbstractBeanFactory
 
     protected void populateBean(BeanDefinition beanDefinition, Object bean) {
 
-        //在bean的实例化时做的操作
+        //在bean的实例化时做的操作 , 为注解生成的bean内的@autowired的属性赋值
         for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
-            //如果BeanPostProcessor 属于bean实例化时的操作
             if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
                 ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessPropertyValues(bean, beanDefinition.getID());
             }
@@ -190,9 +191,13 @@ public class DefaultBeanFactory extends AbstractBeanFactory
     }
 
     protected Object initializeBean(BeanDefinition beanDefinition, Object bean) {
+        //如果bean是BeanFactoryAware类型 , 我也不知道要干啥 ..
         invokeAwareMethod(bean);
         //TODO 对bean做初始化 , 暂不实现
-        //创建代理
+
+        //如果bean不是合成的 , 那么在initializeBean() 中 ,
+        //还要回调beanPostProcessor.afterInitialization(existingBean, beanName)方法
+        //这是在实例化bean后要做的动作 , 作为回调函数
         if (!beanDefinition.isSynthetic()) {
             return applyBeanPostProcessorsAfterInitialization(bean, beanDefinition.getID());
         }

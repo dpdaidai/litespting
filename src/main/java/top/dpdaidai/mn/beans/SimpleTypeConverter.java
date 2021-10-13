@@ -25,6 +25,17 @@ public class SimpleTypeConverter implements TypeConverter {
 
     }
 
+    /**
+     * 判断值和需要的类型是否匹配
+     * 1  如果是引用类型 , 那么它们 value.class 应该 等于 requiredType , 或者是它的子类/实现
+     * 2  如果不匹配 , 并且value是String类型 , 那么多半是要把String转换为主数据类型 , 检查下value是否可以转换为requiredType
+     *
+     * @param value  值
+     * @param requiredType  需要的class类型
+     * @param <T>
+     * @return
+     * @throws TypeMismatchException
+     */
     public <T> T convertIfNecessary(Object value, Class<T> requiredType) throws TypeMismatchException {
 
         if (ClassUtils.isAssignableValue(requiredType, value)) {

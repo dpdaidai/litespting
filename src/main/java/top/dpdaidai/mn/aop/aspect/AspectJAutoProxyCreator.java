@@ -36,6 +36,15 @@ public class AspectJAutoProxyCreator implements BeanPostProcessor {
         return bean;
     }
 
+    /**
+     * 在bean生成后 , 回调的函数 .
+     * 目的 : 判断该bean是否有关联的拦截器 , 如果有 , 则为该bean生成动态代理类替换原bean
+     *
+     * @param bean
+     * @param beanName
+     * @return
+     * @throws BeansException
+     */
     public Object afterInitialization(Object bean, String beanName) throws BeansException {
 
         //如果bean本上就是advice及其子类 , 那么就不在生成动态代理了
@@ -43,6 +52,7 @@ public class AspectJAutoProxyCreator implements BeanPostProcessor {
             return bean;
         }
 
+        //寻找所有和bean匹配的advice , 也就是拦截器
         List<Advice> candidateAdvices = getCandidateAdvices(bean);
         if (candidateAdvices.isEmpty()) {
             return bean;

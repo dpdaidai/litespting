@@ -50,7 +50,7 @@ public class GenericBeanDefinition implements BeanDefinition {
     public void setScope(String scope) {
         this.scope = scope;
         this.singleton = SCOPE_DEFAULT.equals(scope) || SCOPE_SINGLETON.equals(scope);
-        this.prototype = SCOPE_PROTOTYPE.endsWith(scope);
+        this.prototype = SCOPE_PROTOTYPE.equals(scope);
     }
 
     public String getBeanClassName() {

@@ -22,7 +22,10 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     public AbstractApplicationContext(String configFile) {
         defaultBeanFactory = new DefaultBeanFactory();
+        //初始化bean定义解析器 xmlBeanDefinitionReader , 它通过BeanDefinitionRegistry将bean定义注册到beanFactory中
         XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(defaultBeanFactory);
+
+        //加载xml资源文件
         Resource resource = this.getResourceByPath(configFile);
 
         //将xml文件里的内容 , 解析为一个个BeanDefinition , 它是bean的定义类

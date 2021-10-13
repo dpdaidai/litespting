@@ -72,11 +72,25 @@ public class XmlBeanDefinitionReader {
                 Element childElement = iterator.next();
                 String namespaceUri = childElement.getNamespaceURI();
 
+                //根据子元素的命名空间 , 来选择对应的解析方法
                 if (this.isDefaultNamespace(namespaceUri)) {
-                    parseDefaultElement(childElement); //普通的bean
+                    //普通的bean
+                    //<bean id="transactionManager" class="top.dpdaidai.mn.service.tx.TransactionManager"/>
+                    parseDefaultElement(childElement);
                 } else if (this.isContextNamespace(namespaceUri)) {
+                    //包扫描需要需要被纳入框架的bean , 并自动装配
+                    //<context:component-scan base-package="top.dpdaidai.mn.service.v5,top.dpdaidai.mn.service.daoV5" />
                     parseComponentElement(childElement); //例如<context:component-scan>
                 } else if (this.isAOPNamespace(namespaceUri)) {
+                    // 根据aop元素的定义 , 生成相关的拦截器 , 并使用动态代理生成代理对象
+                    // <aop:config>
+                    //        <aop:aspect ref="transactionManager">
+                    //            <aop:pointcut id="placeOrder" expression="execution(* top.dpdaidai.mn.service.v5.*.placeOrder(..))"/>
+                    //            <aop:before pointcut-ref="placeOrder" method="start"/>
+                    //            <aop:after-returning pointcut-ref="placeOrder" method="commit"/>
+                    //            <aop:after-throwing pointcut-ref="placeOrder" method="rollback"/>
+                    //        </aop:aspect>
+                    // </aop:config>
                     parseAOPElement(childElement);
                 }
 
@@ -98,7 +112,8 @@ public class XmlBeanDefinitionReader {
 
     /**
      * 解析xml定义的bean
-     * @param element
+     *
+     * @param element <bean id="itemDao" class="top.dpdaidai.mn.service.v2.ItemDao"/>
      */
     private void parseDefaultElement(Element beanElement) {
         String id = beanElement.attributeValue(ID_ATTRIBUTE);
@@ -147,6 +162,16 @@ public class XmlBeanDefinitionReader {
     }
 
 
+    /**
+     * 解析xml 中构造器的参数
+     *
+     * @param beanElement     <bean id="petStore" class="top.dpdaidai.mn.service.v3.PetStoreService">
+     *                              <constructor-arg  ref="accountDao"/>
+     *                              <constructor-arg  ref="itemDao"/>
+     *                              <constructor-arg  value="1"/>
+     *                        </bean>
+     * @param beanDefinition
+     */
     public void parseConstructorArgElements(Element beanElement, BeanDefinition beanDefinition) {
         Iterator iterator = beanElement.elementIterator(CONSTRUCTOR_ARG_ELEMENT);
         while (iterator.hasNext()) {
@@ -156,7 +181,14 @@ public class XmlBeanDefinitionReader {
 
     }
 
+    /**
+     * 将构造器参数标签
+     *
+     * @param argElement   <constructor-arg  ref="accountDao"/>
+     * @param beanDefinition
+     */
     public void parseConstructorArgElement(Element argElement, BeanDefinition beanDefinition) {
+        //类型和名字缺省
         String type = argElement.attributeValue(TYPE_ATTRIBUTE);
         String name = argElement.attributeValue(NAME_ATTRIBUTE);
         Object value = parsePropertyElement(argElement, null);
@@ -189,6 +221,16 @@ public class XmlBeanDefinitionReader {
         }
     }
 
+    /**
+     *
+     * 解析构造器参数
+     *
+     * @param propertyElement  <constructor-arg  ref="accountDao"/>
+     *                         <constructor-arg  ref="itemDao"/>
+     *                         <constructor-arg  value="1"/>
+     * @param propertyName
+     * @return
+     */
     public Object parsePropertyElement(Element propertyElement, String propertyName) {
         String elementName = (propertyName != null) ?
                 "<property> element for property '" + propertyName + "'" :
@@ -199,6 +241,7 @@ public class XmlBeanDefinitionReader {
         boolean hasValueAttribute = propertyElement.attribute(VALUE_ATTRIBUTE) != null;
 
         if (hasRefAttribute) {
+            //引用类型则返回RuntimeBeanReference , 使用构造参数实例化bean时 , 需要根据refName从beanFactory中获取
             String refName = propertyElement.attributeValue(REF_ATTRIBUTE);
             if (!StringUtils.hasText(refName)) {
                 logger.error(elementName + " contains empty 'ref' attribute");
@@ -206,6 +249,9 @@ public class XmlBeanDefinitionReader {
             RuntimeBeanReference ref = new RuntimeBeanReference(refName);
             return ref;
         } else if (hasValueAttribute) {
+
+            //字符类型和基本数据类型 则返回 TypedStringValue
+            //使用构造参数实例化bean时 , 还需要根据构造器参数的类型 , 来进行转化或者包装
             TypedStringValue valueHolder = new TypedStringValue(propertyElement.attributeValue(VALUE_ATTRIBUTE));
 
             return valueHolder;

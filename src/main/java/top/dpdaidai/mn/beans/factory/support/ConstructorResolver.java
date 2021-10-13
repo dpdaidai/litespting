@@ -51,9 +51,10 @@ public class ConstructorResolver {
             throw new BeanCreationException(beanDefinition.getID(), "Instantiation of bean failed, can't resolve class", e);
         }
 
-        //bean所有的构造器数组
+        //获取beanClass所有的构造器数组
         Constructor<?>[] candidates = beanClass.getConstructors();
 
+        //将bean定义中的构造器参数数组和 candidates 进行比对
         ConstructorArgument constructorArgument = beanDefinition.getConstructorArgument();
         List<ConstructorArgument.ValueHolder> argumentValues = constructorArgument.getArgumentValues();
 
@@ -67,7 +68,7 @@ public class ConstructorResolver {
 
             argsToUse = new Object[parameterTypes.length];
 
-            //返回值为参数是否匹配
+            //参数是否匹配成功
             boolean match = valuesMatchTypes(parameterTypes, argumentValues, argsToUse);
 
             if (match) {
@@ -93,9 +94,9 @@ public class ConstructorResolver {
      * 检查参数类型数组和BeadDefinition中的参数数组是否匹配
      * 匹配则返回true
      *
-     * @param parameterTypes  : 参数类型数组
-     * @param valueHolders    : 构造器参数数组 , 包含参数的名称 , 类型 和 值
-     * @param argsToUse
+     * @param parameterTypes  : 参数类型数组 , 里面是每个参数的class类型
+     * @param valueHolders    : 构造器参数数组 , 包含参数的名称 , 类型 和 值 , 根据值的类型能不能转化为parameterType对应的类型
+     * @param argsToUse       : 如果valueHolders能够转化为parameterType需要的类型 并赋值 , 那么将参数保存在argsToUse中 , 稍后实例化bean
      * @return
      */
     private boolean valuesMatchTypes(Class<?>[] parameterTypes,
